@@ -1,0 +1,477 @@
+.section {
+  position: relative;
+  margin-top: 56px;
+  padding: clamp(28px, 5vw, 52px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 95% 5%, rgba(239, 75, 63, 0.14), transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(255, 194, 26, 0.3), transparent 45%),
+    linear-gradient(140deg, #fff8e8 0%, #ffefc9 55%, #ffe2b8 100%);
+  border: 1px solid #f3dca4;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('/mandala.svg') center / 200px;
+  opacity: 0.35;
+}
+
+.section::after {
+  content: 'ॐ';
+  position: absolute;
+  z-index: -1;
+  right: -30px;
+  bottom: -80px;
+  font-size: 18rem;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(232, 138, 0, 0.07);
+  pointer-events: none;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  margin-bottom: 14px;
+  border-radius: 99px;
+  background: #fff;
+  color: var(--maroon);
+  font-weight: 800;
+  font-size: 0.88rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.intro h2 {
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+html[data-lang='hi'] .intro h2 {
+  line-height: 1.4;
+}
+
+.intro h2 span {
+  background: linear-gradient(120deg, #e88a00, #c0392b 60%, #8b1e1e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lead {
+  font-size: 1.07rem;
+  line-height: 1.85;
+  color: #5c4630;
+  max-width: 600px;
+}
+
+.divisions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+
+.division {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1.5px solid transparent;
+  transition: transform 0.3s var(--ease), border-color 0.3s, box-shadow 0.3s;
+}
+
+.division:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.divA:hover {
+  border-color: var(--saffron);
+}
+
+.divB:hover {
+  border-color: #f08a7e;
+}
+
+.divIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  font-size: 1.5rem;
+  background: linear-gradient(140deg, #fff1cc, #ffd27a);
+}
+
+.divB .divIcon {
+  background: linear-gradient(140deg, #ffe3e0, #ffb3a0);
+}
+
+.division strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.division small {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.divArrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--text-dim);
+  transition: transform 0.3s var(--ease);
+}
+
+.division:hover .divArrow {
+  transform: translateX(3px);
+  color: var(--saffron-deep);
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ghost {
+  border-color: #efcf8a !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* ---------- Pooja mode preview ---------- */
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.device {
+  width: 100%;
+  max-width: 370px;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    url('/mandala.svg') center / 160px,
+    linear-gradient(170deg, #fffaf0, #ffecc0);
+  box-shadow: 0 30px 60px -25px rgba(139, 30, 30, 0.45), 0 0 0 8px rgba(255, 255, 255, 0.6);
+  transform: rotate(-1.5deg);
+  transition: transform 0.6s var(--ease);
+}
+
+.device:hover {
+  transform: rotate(0deg) translateY(-4px);
+}
+
+.deviceBar {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.deviceBar span {
+  display: block;
+  height: 100%;
+  background: var(--grad-saffron);
+  transition: width 0.6s var(--ease);
+}
+
+.deviceHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px 0;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.deviceHead small {
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--text);
+  color: #fff;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.stage {
+  padding: 22px 20px 16px;
+  text-align: center;
+  animation: fadeUp 0.6s var(--ease);
+}
+
+.count {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 99px;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: var(--shadow-sm);
+}
+
+.stage h3 {
+  margin: 12px 0 10px;
+  font-size: 1.35rem;
+  line-height: 1.4;
+}
+
+.mantra {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-sanskrit), var(--font-body), serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--maroon);
+  min-height: 60px;
+}
+
+.samagriMini {
+  margin: 0 18px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.samagriMini small {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.samagriMini div {
+  display: flex;
+  gap: 6px;
+}
+
+.samagriMini span {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #f0e2bf;
+  font-size: 1.1rem;
+  opacity: 0.55;
+}
+
+.samagriMini .ready {
+  opacity: 1;
+}
+
+.samagriMini b {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+}
+
+.deviceNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px 18px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.nextBtn {
+  padding: 8px 16px;
+  border-radius: 99px;
+  background: var(--grad-saffron);
+  color: var(--text);
+}
+
+.shloka {
+  max-width: 370px;
+  text-align: center;
+}
+
+.shloka p {
+  margin: 0;
+  font-family: var(--font-sanskrit), var(--font-body), serif;
+  font-size: 1.1rem;
+  color: var(--maroon);
+}
+
+.shloka small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* ---------- How to use ---------- */
+.howHead {
+  margin: 44px 0 18px;
+}
+
+.howHead h3 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.steps > li {
+  height: 100%;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  border: 1px solid #f3e2b8;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s, border-color 0.3s;
+}
+
+.step:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+  border-color: var(--saffron);
+}
+
+.stepNum {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(232, 138, 0, 0.18);
+}
+
+.stepIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--grad-saffron);
+  color: #3a1d00;
+  box-shadow: 0 8px 18px -8px rgba(232, 138, 0, 0.7);
+}
+
+.step strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.step p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Pooja chips ---------- */
+.poojas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.poojasLabel {
+  font-weight: 700;
+  color: #5c4630;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chips a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid #f1dca8;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: border-color 0.25s, background 0.25s, transform 0.25s var(--ease);
+}
+
+.chips a:hover {
+  border-color: var(--saffron-deep);
+  background: #fff;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1000px) {
+  .top {
+    grid-template-columns: 1fr;
+  }
+  .steps {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .divisions,
+  .steps {
+    grid-template-columns: 1fr;
+  }
+  .ctas > a {
+    flex: 1 1 100%;
+  }
+  .device {
+    transform: none;
+  }
+  .poojas {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

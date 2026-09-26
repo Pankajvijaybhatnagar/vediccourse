@@ -18,6 +18,8 @@ import Icon from '@/components/Icon';
 import Reveal from '@/components/Reveal';
 import HeroArt from './HeroArt';
 import SeoContent from './SeoContent';
+import ManobalSection from './ManobalSection';
+import KarmkandSection from './KarmkandSection';
 import styles from './home.module.css';
 
 const fmtDate = (date, lang, opts = { day: 'numeric', month: 'short', year: 'numeric' }) =>
@@ -481,6 +483,12 @@ export default function HomeClient() {
             </Reveal>
           </div>
         </section>
+
+        {/* Karmkand explainer */}
+        <KarmkandSection />
+
+        {/* Manobal explainer */}
+        <ManobalSection />
 
         {/* Consult the right astrologer */}
         <section className={styles.block}>
