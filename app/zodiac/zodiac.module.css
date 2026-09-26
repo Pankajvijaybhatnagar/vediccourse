@@ -1,0 +1,277 @@
+.section {
+  padding-bottom: 20px;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 36px;
+  min-height: 84px;
+}
+
+.filterNote {
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent), transparent 70%);
+  opacity: 0.18;
+  transition: opacity 0.5s, transform 0.6s var(--ease);
+  pointer-events: none;
+}
+
+.card:hover::after {
+  opacity: 0.35;
+  transform: scale(1.2);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.glyph {
+  font-size: 2.8rem;
+  line-height: 1;
+  color: var(--saffron-deep);
+  transition: transform 0.5s var(--ease);
+}
+
+.card:hover .glyph {
+  transform: scale(1.12) rotate(-8deg);
+}
+
+.element {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--accent) 14%, #fff);
+  filter: saturate(1.4) brightness(0.8);
+}
+
+.card h3 {
+  margin-bottom: 2px;
+  font-size: 1.6rem;
+}
+
+.dates {
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.symbol {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+.traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+/* ---------- Detail page ---------- */
+.detailHero {
+  padding-bottom: 32px;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.emblem {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 20%, #ffe9b0 70%, #ffd27a 100%);
+  box-shadow: var(--shadow-lg), inset 0 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+.emblem::before,
+.emblem::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+
+.emblem::before {
+  inset: -18px;
+  border: 2px dashed var(--saffron-2);
+  animation: spin 60s linear infinite;
+}
+
+.emblem::after {
+  inset: 26px;
+  border: 1.5px solid rgba(184, 138, 60, 0.4);
+}
+
+.emblemGlyph {
+  font-size: clamp(6rem, 13vw, 9rem);
+  line-height: 1;
+  color: var(--saffron-deep);
+  animation: float 8s ease-in-out infinite;
+}
+
+.alt {
+  font-size: 0.45em;
+  color: var(--text-dim);
+}
+
+.summary {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.fact {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.fact span {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+
+.fact strong {
+  font-weight: 700;
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.listCard h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listCard p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.good {
+  border-top: 4px solid var(--green);
+}
+
+.good h3 {
+  color: var(--green);
+}
+
+.bad {
+  border-top: 4px solid var(--vermilion);
+}
+
+.bad h3 {
+  color: var(--vermilion);
+}
+
+.matches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.matchCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.matchGlyph {
+  font-size: 2.6rem;
+  color: var(--saffron-deep);
+}
+
+.matchScore {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .emblem {
+    max-width: 260px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .ctaRow {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .twoCol,
+  .matches {
+    grid-template-columns: 1fr;
+  }
+}

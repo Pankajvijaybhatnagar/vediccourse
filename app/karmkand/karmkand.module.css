@@ -1,0 +1,1466 @@
+/* ==========================================================================
+   कर्मकांड — shared styles (hub, pooja paddhati, pooja samagri)
+   ========================================================================== */
+.section {
+  padding-bottom: 20px;
+}
+
+.block {
+  margin-top: 56px;
+}
+
+.lead {
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+
+/* ---------- Tone palettes (per pooja) ---------- */
+.tone_saffron { --t1: #ffd65a; --t2: #f6a609; --ink: #3a1d00; }
+.tone_rose { --t1: #ffc1cf; --t2: #e8577a; --ink: #4a0f22; }
+.tone_vermilion { --t1: #ffb38a; --t2: #e0452f; --ink: #3f0d05; }
+.tone_gold { --t1: #fff0b3; --t2: #d4a017; --ink: #3a2a00; }
+.tone_yellow { --t1: #fff59d; --t2: #f4c20d; --ink: #3a2e00; }
+.tone_indigo { --t1: #c5c8ff; --t2: #4b4fbf; --ink: #fff; }
+.tone_night { --t1: #7b5cc9; --t2: #25124f; --ink: #fff; }
+.tone_fire { --t1: #ffcf70; --t2: #e8590c; --ink: #3a1400; }
+.tone_green { --t1: #c9f2c7; --t2: #3c9a5f; --ink: #0d2a17; }
+
+/* ---------- Hub: intro & pillars ---------- */
+.introGrid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.introGrid h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.shloka {
+  position: relative;
+  padding: 28px 30px;
+  border-radius: var(--radius-lg);
+  background:
+    url('/mandala.svg') center / 150px,
+    linear-gradient(160deg, #fffaf0, #fdecc4);
+  border: 1px solid #efd9a3;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.shloka::before,
+.shloka::after {
+  content: '❁';
+  position: absolute;
+  font-size: 1.4rem;
+  color: var(--gold-soft);
+}
+
+.shloka::before { top: 10px; left: 14px; }
+.shloka::after { bottom: 10px; right: 14px; }
+
+.sanskrit {
+  font-family: var(--font-sanskrit), var(--font-body), serif;
+  font-size: 1.35rem;
+  line-height: 2;
+  color: var(--maroon);
+  white-space: pre-line;
+}
+
+.shloka small {
+  display: block;
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.pillar {
+  padding: 22px;
+  border-radius: var(--radius);
+  background: var(--bg-cream);
+  text-align: center;
+}
+
+.pillar span {
+  font-size: 2.2rem;
+}
+
+.pillar h3 {
+  margin: 8px 0 4px;
+  font-size: 1.2rem;
+}
+
+.pillar p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Hub: two divisions ---------- */
+.divisions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.division {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 330px;
+  padding: 36px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: var(--shadow);
+  transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease);
+}
+
+.division:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.division::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url('/mandala.svg') right -60px bottom -60px / 260px no-repeat;
+  opacity: 0.55;
+}
+
+.divPaddhati {
+  background: linear-gradient(135deg, #fff1cc 0%, #ffd27a 60%, #f6a609 100%);
+}
+
+.divSamagri {
+  background: linear-gradient(135deg, #ffe3e0 0%, #ffb3a0 55%, #e0452f 100%);
+}
+
+.divIcon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 2.4rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.division h2 {
+  margin: 6px 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+}
+
+.division p {
+  margin: 0;
+  max-width: 440px;
+  font-size: 1.02rem;
+  color: #4a2e12;
+}
+
+.divList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.divList span {
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.divCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 12px 24px;
+  border-radius: 99px;
+  background: var(--text);
+  color: #fff;
+  font-weight: 700;
+  transition: gap 0.3s var(--ease);
+}
+
+.division:hover .divCta {
+  gap: 14px;
+}
+
+/* ---------- Hub: principles ---------- */
+.principles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.principle {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.principleNum {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--grad-saffron);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.principle h3 {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+}
+
+.principle p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ---------- Compare table ---------- */
+.tableWrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+
+.table th {
+  padding: 14px 18px;
+  text-align: left;
+  background: var(--bg-soft);
+  font-size: 0.95rem;
+}
+
+.table td {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.table td:first-child {
+  font-weight: 800;
+  color: var(--saffron-deep);
+  width: 60px;
+}
+
+/* ---------- Learning path ---------- */
+.path {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  counter-reset: path;
+}
+
+.pathStep {
+  position: relative;
+  padding: 24px 20px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s;
+}
+
+.pathStep:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.pathStep::before {
+  counter-increment: path;
+  content: counter(path, devanagari);
+  position: absolute;
+  top: -16px;
+  left: 20px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--grad-saffron);
+  font-weight: 800;
+  box-shadow: 0 0 0 4px var(--bg);
+}
+
+.pathStep h3 {
+  margin: 8px 0 6px;
+  font-size: 1.1rem;
+}
+
+.pathStep p {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Pooja cards ---------- */
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.chip {
+  padding: 9px 18px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+}
+
+.chip:hover {
+  border-color: var(--saffron);
+  color: var(--text);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--grad-saffron);
+  border-color: transparent;
+  color: var(--text);
+}
+
+.poojaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.poojaCard {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: #fff;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s;
+}
+
+.poojaCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+.poojaArt {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 150px;
+  background:
+    url('/mandala.svg') center / 130px,
+    linear-gradient(140deg, var(--t1), var(--t2));
+  overflow: hidden;
+}
+
+.poojaArt::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.14) 0deg 6deg, transparent 6deg 18deg);
+  animation: spin 80s linear infinite;
+}
+
+.poojaEmoji {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 2.6rem;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.35);
+  transition: transform 0.5s var(--ease);
+}
+
+.poojaCard:hover .poojaEmoji {
+  transform: scale(1.1) rotate(-6deg);
+}
+
+.poojaBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  padding: 20px 22px 22px;
+}
+
+.poojaBody h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.poojaDeity {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--saffron-deep);
+}
+
+.poojaBody p {
+  flex: 1;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: var(--bg-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* ---------- Pooja detail ---------- */
+.detailHero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: clamp(28px, 5vw, 48px);
+  border-radius: var(--radius-lg);
+  background:
+    url('/mandala.svg') right -40px center / 240px no-repeat,
+    linear-gradient(130deg, var(--t1), var(--t2));
+  color: var(--ink);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.detailHero .poojaEmoji {
+  width: 120px;
+  height: 120px;
+  font-size: 3.6rem;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.crumbs a:hover {
+  text-decoration: underline;
+}
+
+.detailHero h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.detailHero .meta span {
+  background: rgba(255, 255, 255, 0.75);
+  color: #2a1a0b;
+}
+
+.detailShort {
+  max-width: 700px;
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+  opacity: 0.92;
+}
+
+.detailLayout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 36px;
+  align-items: start;
+  margin-top: 32px;
+}
+
+.toc {
+  position: sticky;
+  top: calc(var(--header-h) + 20px);
+  padding: 18px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.toc strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.toc a {
+  display: block;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.toc a:hover {
+  background: var(--bg-soft);
+  color: var(--saffron-deep);
+}
+
+.content {
+  min-width: 0;
+}
+
+.content > section {
+  scroll-margin-top: calc(var(--header-h) + 20px);
+  margin-bottom: 40px;
+}
+
+.h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+}
+
+.h2::before {
+  content: '';
+  width: 6px;
+  height: 1.2em;
+  border-radius: 3px;
+  background: var(--grad-saffron);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.fact {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--bg-cream);
+}
+
+.fact > span {
+  font-size: 1.8rem;
+}
+
+.fact strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.fact p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.prepList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.prepList li {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px dashed #e7cf98;
+}
+
+.prepList li::before {
+  content: '✓';
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e3f6ea;
+  color: var(--green);
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+/* Samagri checklist */
+.checkHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.progressText {
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.progressBar {
+  height: 8px;
+  border-radius: 99px;
+  background: #f5ecd6;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progressBar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ffc21a, #1e9e5a);
+  border-radius: inherit;
+  transition: width 0.4s var(--ease);
+}
+
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.checkItem:hover {
+  border-color: var(--saffron-2);
+}
+
+.checkItem input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green);
+  flex-shrink: 0;
+}
+
+.checkItem.done {
+  background: #f0faf4;
+  border-color: #a6dcbc;
+}
+
+.checkItem.done .itemName {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+
+.itemEmoji {
+  font-size: 1.4rem;
+}
+
+.itemName {
+  flex: 1;
+  font-weight: 700;
+}
+
+.itemQty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.itemLink {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--saffron-deep);
+  white-space: nowrap;
+}
+
+.extra {
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+}
+
+.extra strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.extra ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-muted);
+}
+
+/* Steps timeline */
+.stepsHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 22px;
+  width: 2px;
+  background: linear-gradient(var(--saffron), #f1dfb0);
+}
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 16px;
+  padding-bottom: 20px;
+}
+
+.stepNum {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--saffron);
+  background: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, transform 0.3s var(--ease);
+}
+
+.stepNum:hover {
+  transform: scale(1.08);
+}
+
+.stepDone .stepNum {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.stepCard {
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+  transition: opacity 0.3s;
+}
+
+.stepDone .stepCard {
+  opacity: 0.65;
+}
+
+.stepCard h3 {
+  margin: 0 0 6px;
+  font-size: 1.12rem;
+}
+
+.stepCard p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.stepMantra {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fff8e6;
+  border-left: 3px solid var(--saffron-deep);
+  font-family: var(--font-sanskrit), var(--font-body), serif;
+  font-size: 1.1rem;
+  line-height: 1.9;
+  color: var(--maroon);
+  white-space: pre-line;
+}
+
+/* Mantra cards */
+.mantras {
+  display: grid;
+  gap: 18px;
+}
+
+.mantraCard {
+  position: relative;
+  padding: 24px 26px;
+  border-radius: var(--radius-lg);
+  background:
+    url('/mandala.svg') right -30px top -30px / 140px no-repeat,
+    linear-gradient(160deg, #fffaf0, #fdf0d2);
+  border: 1px solid #efd9a3;
+}
+
+.mantraTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mantraTop h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--saffron-deep);
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 1px solid #e7cf98;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.copyBtn:hover {
+  background: var(--saffron);
+}
+
+.mantraText {
+  font-family: var(--font-sanskrit), var(--font-body), serif;
+  font-size: 1.3rem;
+  line-height: 2;
+  color: var(--maroon);
+  white-space: pre-line;
+  margin: 0 0 12px;
+}
+
+.mantraMeaning {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px dashed #e7cf98;
+  color: var(--text-muted);
+}
+
+.mantraMeaning b {
+  color: var(--text);
+}
+
+/* Rules & benefits */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.listCard {
+  padding: 24px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.listCard h3 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
+.listCard ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.listCard li {
+  display: flex;
+  gap: 10px;
+  color: var(--text-muted);
+}
+
+.rules {
+  border-top: 4px solid var(--vermilion);
+}
+
+.rules li::before {
+  content: '⚠';
+  color: var(--vermilion);
+  flex-shrink: 0;
+}
+
+.benefits {
+  border-top: 4px solid var(--green);
+}
+
+.benefits li::before {
+  content: '✿';
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.faqItem {
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fffcf2;
+  overflow: hidden;
+}
+
+.faqItem summary {
+  padding: 14px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+
+.faqItem summary::after {
+  content: '+';
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--saffron-deep);
+  transition: transform 0.3s var(--ease);
+}
+
+.faqItem[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faqItem p {
+  margin: 0;
+  padding: 0 18px 16px;
+  color: var(--text-muted);
+}
+
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.pager a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 220px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+  transition: border-color 0.25s, transform 0.3s var(--ease);
+}
+
+.pager a:hover {
+  border-color: var(--saffron);
+  transform: translateY(-3px);
+}
+
+.pager a:last-child {
+  text-align: right;
+}
+
+.pager small {
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.pager strong {
+  font-size: 1.05rem;
+}
+
+/* Focus (step-by-step) mode */
+.focusOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  background:
+    url('/mandala.svg') center / 220px,
+    linear-gradient(160deg, #fffaf0, #ffe9b0);
+  animation: fadeUp 0.35s var(--ease);
+}
+
+.focusTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.focusTop strong {
+  font-size: 1rem;
+}
+
+.focusClose {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 0;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.focusBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+  overflow-y: auto;
+}
+
+.focusCount {
+  padding: 6px 16px;
+  border-radius: 99px;
+  background: var(--text);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.focusBody h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  line-height: 1.35;
+}
+
+.focusBody p {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+  line-height: 1.9;
+  color: var(--text-muted);
+}
+
+.focusMantra {
+  width: 100%;
+  padding: 20px 24px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-sanskrit), var(--font-body), serif;
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  line-height: 2;
+  color: var(--maroon);
+  white-space: pre-line;
+  box-shadow: var(--shadow-sm);
+}
+
+.focusNav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+}
+
+.focusBar {
+  height: 5px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.focusBar span {
+  display: block;
+  height: 100%;
+  background: var(--grad-saffron);
+  transition: width 0.4s var(--ease);
+}
+
+/* ---------- Samagri encyclopedia ---------- */
+.samagriTools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.search {
+  position: relative;
+  flex: 1 1 280px;
+}
+
+.search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+}
+
+.search input {
+  padding-left: 42px;
+}
+
+.catHead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 36px 0 16px;
+}
+
+.catHead span {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--bg-cream);
+  font-size: 1.6rem;
+}
+
+.catHead h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.catHead p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+}
+
+.samagriGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.sCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+  text-align: left;
+  cursor: pointer;
+  scroll-margin-top: calc(var(--header-h) + 20px);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s, border-color 0.3s;
+}
+
+.sCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--saffron-2);
+}
+
+.sTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sEmoji {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(140deg, #fff5d6, #ffe0a0);
+  font-size: 1.7rem;
+}
+
+.sTop h3 {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.sTop small {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+}
+
+.sCard p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sMore {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--saffron-deep);
+}
+
+.empty {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* Samagri modal */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(42, 26, 11, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  background: #fff url('/mandala.svg') top right / 170px no-repeat;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.35s var(--ease);
+}
+
+.modalHead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modalHead .sEmoji {
+  width: 72px;
+  height: 72px;
+  font-size: 2.3rem;
+}
+
+.modalHead h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.modalHead small {
+  color: var(--text-muted);
+}
+
+.modalSection {
+  margin-bottom: 18px;
+}
+
+.modalSection h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  color: var(--saffron-deep);
+}
+
+.modalSection p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.85;
+}
+
+.tipBox {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fdf0ef;
+  border-left: 4px solid var(--vermilion);
+}
+
+.tipBox h3 {
+  color: var(--vermilion);
+}
+
+.usedIn {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.usedIn a {
+  padding: 5px 12px;
+  border-radius: 99px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.usedIn a:hover {
+  border-color: var(--saffron);
+}
+
+.modalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--bg-soft);
+  cursor: pointer;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .poojaGrid,
+  .samagriGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .path {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 32px;
+  }
+  .detailLayout {
+    grid-template-columns: 1fr;
+  }
+  .toc {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .toc strong {
+    width: 100%;
+  }
+  .toc a {
+    background: var(--bg-soft);
+  }
+}
+
+@media (max-width: 860px) {
+  .introGrid,
+  .divisions,
+  .twoCol,
+  .facts {
+    grid-template-columns: 1fr;
+  }
+  .principles,
+  .pillars {
+    grid-template-columns: 1fr;
+  }
+  .detailHero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+  }
+  .detailHero .meta,
+  .crumbs {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .poojaGrid,
+  .samagriGrid,
+  .checklist,
+  .path {
+    grid-template-columns: 1fr;
+  }
+  .division {
+    padding: 26px;
+    min-height: 0;
+  }
+  .modal {
+    padding: 24px 20px;
+  }
+  .sanskrit,
+  .mantraText {
+    font-size: 1.15rem;
+  }
+  .timeline::before {
+    left: 18px;
+  }
+  .step {
+    grid-template-columns: 38px 1fr;
+    gap: 12px;
+  }
+  .stepNum {
+    width: 38px;
+    height: 38px;
+  }
+}

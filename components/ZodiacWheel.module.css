@@ -1,0 +1,86 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+}
+
+.glow {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(233, 196, 122, 0.35), rgba(139, 108, 255, 0.2) 45%, transparent 70%);
+  filter: blur(40px);
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+.svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.outer,
+.inner {
+  transform-origin: 200px 200px;
+  transform-box: view-box;
+}
+
+.outer {
+  animation: spin 120s linear infinite;
+}
+
+.inner {
+  animation: spin 80s linear infinite reverse;
+}
+
+.glyph {
+  fill: #f6dfa8;
+  font-size: 18px;
+}
+
+.core {
+  filter: drop-shadow(0 0 18px rgba(233, 196, 122, 0.8));
+}
+
+.orbit {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.o1 {
+  inset: -4%;
+  border: 1px dashed rgba(183, 156, 255, 0.12);
+  animation: spin 22s linear infinite;
+}
+
+.o2 {
+  inset: 18%;
+  animation: spin 34s linear infinite reverse;
+}
+
+.planet {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  border-radius: 50%;
+}
+
+.p1 {
+  width: 12px;
+  height: 12px;
+  margin: -6px;
+  background: radial-gradient(circle at 30% 30%, #fff, #b79cff);
+  box-shadow: 0 0 16px #8b6cff;
+}
+
+.p2 {
+  width: 8px;
+  height: 8px;
+  margin: -4px;
+  background: radial-gradient(circle at 30% 30%, #fff, #ff8fb8);
+  box-shadow: 0 0 12px #ff8fb8;
+}

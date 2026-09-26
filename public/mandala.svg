@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none" stroke="#e7cf98" stroke-width="0.8">
+  <g transform="translate(90 90)">
+    <circle r="22"/><circle r="30" stroke-dasharray="2 3"/>
+    <g id="p"><path d="M0-22 C8-34 8-44 0-54 C-8-44 -8-34 0-22Z"/><circle cy="-60" r="2.2"/></g>
+    <use href="#p" transform="rotate(45)"/><use href="#p" transform="rotate(90)"/><use href="#p" transform="rotate(135)"/>
+    <use href="#p" transform="rotate(180)"/><use href="#p" transform="rotate(225)"/><use href="#p" transform="rotate(270)"/><use href="#p" transform="rotate(315)"/>
+    <path d="M0-8 L2-2 8 0 2 2 0 8 -2 2 -8 0 -2-2Z"/>
+  </g>
+  <g stroke-width="0.6"><path d="M0 0 L8 0 M0 0 L0 8 M180 0 L172 0 M180 0 L180 8 M0 180 L8 180 M0 180 L0 172 M180 180 L172 180 M180 180 L180 172"/></g>
+</svg>

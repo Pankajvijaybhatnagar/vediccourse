@@ -1,0 +1,64 @@
+.header {
+  padding-top: calc(var(--header-h) + 16px);
+  padding-bottom: 40px;
+}
+
+.banner {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(32px, 5vw, 56px) clamp(24px, 5vw, 64px);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.9), transparent 60%),
+    linear-gradient(115deg, #fff4d6 0%, #ffe7a8 55%, #ffd27a 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+.banner h1 {
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.crumbs {
+  position: absolute;
+  top: 16px;
+  left: 24px;
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.crumbs a:hover {
+  color: var(--saffron-deep);
+}
+
+.lead {
+  max-width: 660px;
+  margin: 0 auto;
+  font-size: 1.08rem;
+  color: var(--text-muted);
+}
+
+.om {
+  position: absolute;
+  right: -10px;
+  bottom: -50px;
+  font-size: 12rem;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(232, 138, 0, 0.08);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .banner {
+    padding-top: 48px;
+  }
+  .crumbs {
+    left: 16px;
+    top: 14px;
+  }
+}

@@ -1,0 +1,76 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+}
+
+.mark svg {
+  position: absolute;
+  inset: 0;
+  animation: spin 40s linear infinite;
+}
+
+.om {
+  position: relative;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #3a1d00;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.name {
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.name span {
+  background: var(--grad-gold-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tag {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.light .name {
+  color: #fff;
+}
+
+.light .tag {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 400px) {
+  .tag {
+    display: none;
+  }
+  .name {
+    font-size: 1.35rem;
+  }
+}

@@ -1,0 +1,335 @@
+.section {
+  padding-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.dateNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dateNav button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.dateNav button:hover:not(:disabled) {
+  background: var(--saffron);
+  border-color: var(--saffron);
+}
+
+.dateNav .input {
+  width: auto;
+  font-weight: 700;
+}
+
+.cityPick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--saffron-deep);
+}
+
+.cityPick .input {
+  min-width: 220px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 32px;
+  padding: 28px 32px;
+  border-radius: var(--radius-lg);
+  color: #fff;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255, 194, 26, 0.35), transparent 45%),
+    url('/mandala.svg') right -30px center / 200px no-repeat,
+    var(--grad-night);
+  box-shadow: var(--shadow);
+}
+
+.heroDate {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.heroDay {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 20px;
+  background: var(--grad-saffron);
+  color: #2a1a0b;
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+
+.heroDate strong {
+  display: block;
+  font-size: 1.2rem;
+}
+
+.heroDate small {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.95rem;
+}
+
+.heroTithi {
+  text-align: center;
+}
+
+.heroTithi small {
+  color: var(--saffron-2);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.heroTithi strong {
+  display: block;
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.tithiBar {
+  max-width: 240px;
+  height: 6px;
+  margin: 8px auto 0;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.tithiBar span {
+  display: block;
+  height: 100%;
+  background: var(--grad-saffron);
+  border-radius: inherit;
+}
+
+.sun {
+  display: flex;
+  gap: 16px;
+}
+
+.sun > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--saffron-2);
+}
+
+.sun small {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sun strong {
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+/* ---------- Five limbs ---------- */
+.fiveLimbs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.limb {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 20px 18px;
+  border-radius: var(--radius);
+  background: var(--bg-cream);
+  overflow: hidden;
+}
+
+.limbNum {
+  position: absolute;
+  right: 10px;
+  top: -6px;
+  font-size: 3.6rem;
+  font-weight: 900;
+  color: rgba(184, 138, 60, 0.15);
+}
+
+.limb small {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--saffron-deep);
+}
+
+.limb strong {
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+
+.limb em {
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.twoCol,
+.chogWrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.muhurat h3,
+.chogWrap h3 {
+  font-size: 1.2rem;
+}
+
+.muhurat ul,
+.chog {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.muhurat li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: var(--bg-soft);
+}
+
+.muhurat li span {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.muhurat li.good {
+  background: #e3f6ea;
+}
+
+.muhurat li.good strong {
+  color: var(--green);
+}
+
+.muhurat li.bad {
+  background: #fdeceb;
+}
+
+.muhurat li.bad strong {
+  color: #c0392b;
+}
+
+.chog li {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  border-left: 4px solid transparent;
+  font-size: 0.95rem;
+}
+
+.chog li.good {
+  background: #eaf8f0;
+  border-left-color: var(--green);
+}
+
+.chog li.bad {
+  background: #fdf0ef;
+  border-left-color: var(--vermilion);
+}
+
+.chog li.neutral {
+  background: #f5f2ea;
+  border-left-color: var(--gold-soft);
+}
+
+.chog li span {
+  color: var(--text-muted);
+}
+
+.chog li em {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--text);
+  color: #fff;
+}
+
+.chog li.live {
+  box-shadow: 0 0 0 2px var(--saffron);
+}
+
+.note {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 780px;
+  margin: 8px auto 0;
+}
+
+@media (max-width: 1000px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+  }
+  .fiveLimbs {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .twoCol,
+  .chogWrap {
+    grid-template-columns: 1fr;
+  }
+  .fiveLimbs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .controls {
+    justify-content: center;
+  }
+  .cityPick .input {
+    min-width: 0;
+  }
+}

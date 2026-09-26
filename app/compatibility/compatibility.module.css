@@ -1,0 +1,258 @@
+.section {
+  padding-bottom: 20px;
+}
+
+.picker {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 32px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 48px);
+}
+
+.selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.selectorGlyph {
+  display: grid;
+  place-items: center;
+  width: 126px;
+  height: 126px;
+  border-radius: 50%;
+  font-size: 4rem;
+  color: var(--saffron-deep);
+  background: radial-gradient(circle, #fff 30%, #ffe9b0 100%);
+  border: 2px solid var(--saffron-2);
+  box-shadow: 0 0 0 8px var(--bg-soft), var(--shadow);
+  animation: popIn 0.6s var(--ease) both;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7) rotate(-20deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.selectorLabel {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.selector select {
+  max-width: 220px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.selectorMeta {
+  font-size: 0.85rem;
+  font-weight: 700;
+  filter: brightness(0.8) saturate(1.4);
+}
+
+.swap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 8px;
+  transition: transform 0.4s var(--ease);
+}
+
+.swap small {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.swap:hover {
+  transform: scale(1.1);
+  color: var(--text);
+}
+
+.heart {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  color: #fff;
+  background: var(--grad-sunset);
+  box-shadow: 0 8px 20px -6px rgba(239, 75, 63, 0.6);
+  animation: pulseGlow 1.8s ease-in-out infinite;
+}
+
+.revealRow {
+  display: flex;
+  justify-content: center;
+  margin: 32px 0 40px;
+}
+
+.result {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 48px);
+}
+
+.resultTop {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 40px;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.ring {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ringValue {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringValue strong {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ringValue span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.pair .glyph {
+  color: var(--saffron-deep);
+  font-size: 1.3rem;
+}
+
+.amp {
+  font-size: 1.3rem;
+  color: var(--vermilion);
+  margin: 0 6px;
+}
+
+.verdictTitle {
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  color: var(--maroon);
+}
+
+.guna {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 99px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+}
+
+.guna strong {
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: var(--grad-saffron);
+  font-weight: 800;
+}
+
+.guna span {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 40px;
+  padding-top: 28px;
+  border-top: 1px dashed var(--border);
+}
+
+.categoryHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.categoryHead strong {
+  color: var(--saffron-deep);
+}
+
+.note {
+  margin: 28px 0 0;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.note a {
+  color: var(--saffron-deep);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .picker {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .selectorGlyph {
+    width: 100px;
+    height: 100px;
+    font-size: 3.2rem;
+  }
+  .resultTop {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .pair {
+    justify-content: center;
+  }
+  .categories {
+    grid-template-columns: 1fr;
+  }
+}
