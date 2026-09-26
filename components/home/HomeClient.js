@@ -12,7 +12,7 @@ import { SIGNS, localizeSign } from '@/lib/zodiac';
 import { ASTROLOGERS, LIVE_SESSIONS, SKILLS, LANGS, getAstrologer, initials } from '@/lib/astrologers';
 import {
   HERO_SLIDES, QUICK_ACTIONS, APPOINTMENTS, READINGS, CONSULT_TOPICS, BLOGS, VIDEOS, NEWS, STATS,
-  TESTIMONIALS, PARTNERS, FAQS,
+  TESTIMONIALS, FAQS,
 } from '@/lib/content';
 import Icon from '@/components/Icon';
 import Reveal from '@/components/Reveal';
@@ -418,7 +418,7 @@ export default function HomeClient() {
 
         {/* Learn: Karmkand + Jyotish course */}
         <section className={styles.block}>
-          <RowHead title={{ en: 'Learn from the Basics — in Pure Hindi', hi: 'आरंभ से सीखें — शुद्ध हिंदी में' }} om />
+          <RowHead title={{ en: 'Learn & Grow', hi: 'सीखें और आगे बढ़ें' }} om />
           <div className={styles.learnGrid}>
             <Reveal>
               <Link href="/karmkand" className={`${styles.learn} ${styles.learnKarm}`}>
@@ -458,6 +458,25 @@ export default function HomeClient() {
                   <span>दशा</span>
                 </span>
                 <span className={styles.learnCta}>{t({ en: 'Begin lesson 1 →', hi: 'पहला पाठ आरंभ करें →' })}</span>
+              </Link>
+            </Reveal>
+            <Reveal delay={240}>
+              <Link href="/manobal" className={`${styles.learn} ${styles.learnManobal}`}>
+                <span className={styles.learnIcon} aria-hidden="true">🧘</span>
+                <span className={styles.learnTag}>{t({ en: 'New · Mind & Career', hi: 'नया · मन एवं करियर' })}</span>
+                <strong>{t({ en: 'Manobal — Student & Life Guidance', hi: 'मनोबल — विद्यार्थी एवं जीवन मार्गदर्शन' })}</strong>
+                <span className={styles.learnText}>
+                  {t({
+                    en: '12 chapters to handle stress, anxiety and low mood, plus a Kundli-based Career Compass and a private self-check.',
+                    hi: 'तनाव, चिंता और उदासी से निपटने के 12 अध्याय, कुंडली आधारित करियर कम्पास और गोपनीय स्व-जाँच।',
+                  })}
+                </span>
+                <span className={styles.learnChips}>
+                  <span>{t({ en: 'Breathing', hi: 'श्वास' })}</span>
+                  <span>{t({ en: 'Exam stress', hi: 'परीक्षा तनाव' })}</span>
+                  <span>{t({ en: 'Career', hi: 'करियर' })}</span>
+                </span>
+                <span className={styles.learnCta}>{t({ en: 'Begin your journey →', hi: 'यात्रा आरंभ करें →' })}</span>
               </Link>
             </Reveal>
           </div>
@@ -603,19 +622,6 @@ export default function HomeClient() {
       <Testimonials />
 
       <div className="container">
-        <section className={styles.partners}>
-          <h2>{t({ en: 'Our Partners', hi: 'हमारे साझेदार' })}</h2>
-          <p>{t({ en: 'We have worked with 50+ partners', hi: 'हमने 50+ साझेदारों के साथ काम किया है' })}</p>
-          <div className={styles.partnerGrid}>
-            {PARTNERS.map((name, i) => (
-              <span key={name} className={styles.partner} style={{ '--c': ['#c2410c', '#7c3aed', '#0e7490', '#be123c', '#15803d', '#b45309', '#1d4ed8', '#9d174d', '#a16207'][i] }}>
-                <span className={styles.partnerMark}>{name[0]}</span>
-                {name}
-              </span>
-            ))}
-          </div>
-        </section>
-
         <SeoContent />
         <Faq />
       </div>

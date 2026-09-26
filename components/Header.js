@@ -141,12 +141,12 @@ export default function Header() {
                   <button className={`${styles.navLink} ${isActive(item) ? styles.active : ''}`} aria-haspopup="true">
                     {t(item.label)}
                     <ChevronDown size={14} className={styles.chev} />
-                    {item.badge && <span className={`${styles.badge} ${item.badgeTone === 'red' ? styles.badgeRed : ''}`}>{t(item.badge)}</span>}
+                    {item.badge && <span className={`${styles.badge} ${item.badgeTone === 'red' ? styles.badgeRed : item.badgeTone === 'teal' ? styles.badgeTeal : ''}`}>{t(item.badge)}</span>}
                   </button>
                 ) : (
                   <Link href={item.href} className={`${styles.navLink} ${isActive(item) ? styles.active : ''}`}>
                     {t(item.label)}
-                    {item.badge && <span className={`${styles.badge} ${item.badgeTone === 'red' ? styles.badgeRed : ''}`}>{t(item.badge)}</span>}
+                    {item.badge && <span className={`${styles.badge} ${item.badgeTone === 'red' ? styles.badgeRed : item.badgeTone === 'teal' ? styles.badgeTeal : ''}`}>{t(item.badge)}</span>}
                   </Link>
                 )}
                 {item.children && (
@@ -200,7 +200,7 @@ export default function Header() {
             ) : (
               <Link key={item.label.en} href={item.href} className={styles.drawerLink} tabIndex={menuOpen ? 0 : -1} onClick={() => setMenuOpen(false)}>
                 {t(item.label)}
-                {item.badge && <span className={`${styles.badge} ${styles.badgeInline} ${item.badgeTone === 'red' ? styles.badgeRed : ''}`}>{t(item.badge)}</span>}
+                {item.badge && <span className={`${styles.badge} ${styles.badgeInline} ${item.badgeTone === 'red' ? styles.badgeRed : item.badgeTone === 'teal' ? styles.badgeTeal : ''}`}>{t(item.badge)}</span>}
               </Link>
             )
           )}

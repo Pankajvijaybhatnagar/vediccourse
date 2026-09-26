@@ -239,6 +239,11 @@
   color: #fff;
 }
 
+.badgeTeal {
+  background: #2a9d8f;
+  color: #fff;
+}
+
 .badgeInline {
   position: static;
   transform: none;

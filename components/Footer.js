@@ -27,6 +27,8 @@ const USEFUL = [
   { href: '/contact', label: { en: 'Careers', hi: 'करियर' } },
   { href: '/contact', label: { en: 'Refund Policy', hi: 'रिफ़ंड नीति' } },
   { href: '/#news', label: { en: 'Media Coverage', hi: 'मीडिया कवरेज' } },
+  { href: '/#videos', label: { en: 'Videos', hi: 'वीडियो' } },
+  { href: '/#blogs', label: { en: 'Blog', hi: 'ब्लॉग' } },
 ];
 
 const SOCIAL = [
