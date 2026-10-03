@@ -41,7 +41,7 @@ function loadDistrict(stateId, districtId) {
  * Calls onChange with { lat, lon, tz, name: {en, hi} } or null while incomplete.
  * If no village is chosen, the district's centre is used.
  */
-export default function BirthPlacePicker({ onChange, error }) {
+export default function BirthPlacePicker({ onChange, error, idPrefix = 'bp' }) {
   const { t } = useLang();
   const [stateId, setStateId] = useState('');
   const [districtId, setDistrictId] = useState('');
@@ -152,8 +152,8 @@ export default function BirthPlacePicker({ onChange, error }) {
   return (
     <>
       <div className="field">
-        <label htmlFor="bp-state">{t({ en: 'State / UT', hi: 'राज्य / केंद्र शासित प्रदेश' })}</label>
-        <select id="bp-state" className={`input ${error && !stateId ? 'invalid' : ''}`} value={stateId} onChange={pickState}>
+        <label htmlFor={`${idPrefix}-state`}>{t({ en: 'State / UT', hi: 'राज्य / केंद्र शासित प्रदेश' })}</label>
+        <select id={`${idPrefix}-state`} className={`input ${error && !stateId ? 'invalid' : ''}`} value={stateId} onChange={pickState}>
           <option value="">{t({ en: '— Select state —', hi: '— राज्य चुनें —' })}</option>
           {PLACE_STATES.map((s) => (
             <option key={s.id} value={s.id}>
@@ -163,8 +163,8 @@ export default function BirthPlacePicker({ onChange, error }) {
         </select>
       </div>
       <div className="field">
-        <label htmlFor="bp-district">{t({ en: 'District', hi: 'ज़िला' })}</label>
-        <select id="bp-district" className={`input ${error && stateId && !districtId ? 'invalid' : ''}`} value={districtId} onChange={pickDistrict} disabled={!state}>
+        <label htmlFor={`${idPrefix}-district`}>{t({ en: 'District', hi: 'ज़िला' })}</label>
+        <select id={`${idPrefix}-district`} className={`input ${error && stateId && !districtId ? 'invalid' : ''}`} value={districtId} onChange={pickDistrict} disabled={!state}>
           <option value="">{t({ en: '— Select district —', hi: '— ज़िला चुनें —' })}</option>
           {state?.districts.map((d) => (
             <option key={d.id} value={d.id}>
@@ -176,19 +176,19 @@ export default function BirthPlacePicker({ onChange, error }) {
       {error && (!stateId || !districtId) && <span className={`error-text ${styles.full}`}>{t(error)}</span>}
 
       <div className={`field ${styles.full}`} ref={boxRef}>
-        <label htmlFor="bp-village">
+        <label htmlFor={`${idPrefix}-village`}>
           {t({ en: 'Village / Town / City', hi: 'गाँव / कस्बा / शहर' })} <span className={styles.optional}>{t({ en: '(optional)', hi: '(वैकल्पिक)' })}</span>
         </label>
         <div className={styles.combo}>
           <Search size={17} className={styles.searchIcon} aria-hidden="true" />
           <input
-            id="bp-village"
+            id={`${idPrefix}-village`}
             className="input"
             role="combobox"
             aria-expanded={open && results.length > 0}
-            aria-controls="bp-village-list"
+            aria-controls={`${idPrefix}-village-list`}
             aria-autocomplete="list"
-            aria-activedescendant={open && results[active] ? `bp-opt-${active}` : undefined}
+            aria-activedescendant={open && results[active] ? `${idPrefix}-opt-${active}` : undefined}
             autoComplete="off"
             disabled={!district}
             placeholder={
@@ -213,12 +213,12 @@ export default function BirthPlacePicker({ onChange, error }) {
             </button>
           )}
           {open && status === 'ready' && district && (
-            <ul id="bp-village-list" role="listbox" className={styles.list} ref={listRef}>
+            <ul id={`${idPrefix}-village-list`} role="listbox" className={styles.list} ref={listRef}>
               {results.length ? (
                 results.map((p, i) => (
                   <li
                     key={`${p.name}-${p.lat}-${p.lon}`}
-                    id={`bp-opt-${i}`}
+                    id={`${idPrefix}-opt-${i}`}
                     role="option"
                     aria-selected={i === active}
                     className={styles.option}

@@ -379,12 +379,19 @@
   .grid3 {
     grid-template-columns: minmax(0, 1fr);
   }
+  .tableCard {
+    padding: 18px 12px;
+  }
   .table {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
   .table th,
   .table td {
-    padding: 8px 6px;
+    padding: 8px 4px;
+  }
+  .table th {
+    font-size: 0.68rem;
+    letter-spacing: 0;
   }
   .table td:nth-child(4) {
     white-space: normal;

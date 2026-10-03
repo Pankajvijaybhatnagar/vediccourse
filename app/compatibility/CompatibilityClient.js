@@ -145,12 +145,10 @@ export default function CompatibilityClient() {
                 </p>
                 <h2 className={styles.verdictTitle}>{t(result.verdict.title)}</h2>
                 <p className="muted">{t(result.verdict.text)}</p>
-                <div className={styles.guna}>
-                  <strong>
-                    {result.gunas}/36
-                  </strong>
-                  <span>{t({ en: 'Guna Milan (sign-based estimate)', hi: 'गुण मिलान (राशि आधारित अनुमान)' })}</span>
-                </div>
+                <Link href="/kundli-milan" className={styles.guna}>
+                  <strong>36</strong>
+                  <span>{t({ en: 'Get exact Guna Milan from birth details →', hi: 'जन्म विवरण से सटीक गुण मिलान करें →' })}</span>
+                </Link>
               </div>
             </div>
 
@@ -170,10 +168,11 @@ export default function CompatibilityClient() {
 
             <p className={styles.note}>
               {t({
-                en: 'For complete Ashtakoot Kundli matching with birth details, ',
-                hi: 'जन्म विवरण के साथ पूर्ण अष्टकूट कुंडली मिलान के लिए ',
+                en: 'This is a sun-sign reading for fun. For marriage, use the full ',
+                hi: 'यह राशि आधारित सामान्य अनुकूलता है। विवाह हेतु जन्म विवरण से पूर्ण ',
               })}
-              <Link href="/astrologers?focus=marriage">{t({ en: 'consult a marriage astrologer', hi: 'विवाह ज्योतिषी से परामर्श लें' })}</Link>.
+              <Link href="/kundli-milan">{t({ en: 'Ashtakoot Kundli Milan (36 gunas)', hi: 'अष्टकूट कुंडली मिलान (36 गुण)' })}</Link>
+              {t({ en: '.', hi: ' करें।' })}
             </p>
           </div>
         )}

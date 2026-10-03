@@ -13,7 +13,7 @@ import styles from './Header.module.css';
 const NOTIFICATIONS = [
   { icon: Sun, text: { en: "Your daily horoscope is ready. See what today holds!", hi: 'आपका आज का राशिफल तैयार है। देखें आज क्या खास है!' }, href: '/horoscope', time: { en: 'Just now', hi: 'अभी' } },
   { icon: CalendarDays, text: { en: "Check today's Panchang, Rahu Kaal and auspicious muhurat.", hi: 'आज का पंचांग, राहु काल और शुभ मुहूर्त देखें।' }, href: '/panchang', time: { en: '1h ago', hi: '1 घंटा पहले' } },
-  { icon: Sparkles, text: { en: 'New: Free Kundli matching for marriage.', hi: 'नया: विवाह के लिए मुफ़्त कुंडली मिलान।' }, href: '/compatibility', time: { en: 'Today', hi: 'आज' } },
+  { icon: Sparkles, text: { en: 'New: Free Kundli matching for marriage.', hi: 'नया: विवाह के लिए मुफ़्त कुंडली मिलान।' }, href: '/kundli-milan', time: { en: 'Today', hi: 'आज' } },
 ];
 
 function LangToggle({ className = '' }) {
