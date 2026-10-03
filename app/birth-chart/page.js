@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import PageHeader from '@/components/PageHeader';
 import BirthChartClient from './BirthChartClient';
 
@@ -19,7 +20,9 @@ export default function BirthChartPage() {
           hi: 'अपना जन्म विवरण दर्ज करें और लग्न, राशि, नक्षत्र, ग्रह स्थिति और महादशा सहित अपनी वैदिक जन्म कुंडली पाएँ।',
         }}
       />
-      <BirthChartClient />
+      <Suspense fallback={null}>
+        <BirthChartClient />
+      </Suspense>
     </>
   );
 }

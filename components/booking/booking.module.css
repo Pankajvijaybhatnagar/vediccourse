@@ -1,0 +1,365 @@
+/* ---------- Payment notice ---------- */
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto 20px;
+  max-width: 520px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  text-align: center;
+}
+
+p.notice {
+  flex-direction: row;
+  justify-content: center;
+}
+
+.notice p {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  text-align: left;
+}
+
+.notice svg {
+  flex-shrink: 0;
+}
+
+.noticeWarn {
+  background: #fff6ed;
+  border-color: #fdba74;
+}
+
+.noticeWarn p svg {
+  color: #ea580c;
+  margin-top: 3px;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  color: var(--saffron-deep);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Booking status page ---------- */
+.wrap {
+  max-width: 1100px;
+}
+
+.narrow {
+  max-width: 560px;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  border: 1px solid var(--border-strong);
+  font-weight: 600;
+}
+
+.banner svg {
+  flex-shrink: 0;
+  color: var(--saffron-deep);
+}
+
+.bannerOk {
+  background: #eaf8f0;
+  border-color: #86d3a7;
+}
+
+.bannerOk svg {
+  color: var(--green);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 28px;
+  margin-bottom: 22px;
+}
+
+.h1 {
+  margin: 4px 0;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 1.15rem;
+}
+
+.bookingNo {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.bookingNo strong {
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.pill {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  background: var(--bg-soft);
+  color: var(--saffron-deep);
+  border: 1px solid var(--border-strong);
+}
+
+.pill_confirmed,
+.pill_completed {
+  background: #eaf8f0;
+  color: var(--green);
+  border-color: #86d3a7;
+}
+
+.pill_rescheduled {
+  background: #eef2ff;
+  color: #4338ca;
+  border-color: #c7d2fe;
+}
+
+.pill_cancelled {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 22px;
+  align-items: start;
+}
+
+.main,
+.side {
+  display: grid;
+  gap: 22px;
+}
+
+.panel {
+  padding: 22px 24px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 20px;
+  margin: 0;
+}
+
+.details dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.details dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+}
+
+.astro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg-cream);
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.actions svg {
+  vertical-align: -2px;
+}
+
+.danger {
+  color: #b91c1c;
+}
+
+.dangerSolid {
+  background: #b91c1c;
+  color: #fff;
+  border: 0;
+}
+
+.small {
+  flex-basis: 100%;
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.linkBtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--saffron-deep);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.inlineForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: end;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-cream);
+}
+
+.inlineForm > p,
+.inlineForm > button {
+  grid-column: 1 / -1;
+}
+
+.inlineForm > button {
+  justify-self: start;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 18px;
+  border-left: 2px solid var(--border);
+}
+
+.timeline li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0 16px 10px;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--saffron);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px var(--saffron);
+}
+
+.timeline .tl_confirmed::before,
+.timeline .tl_completed::before {
+  background: var(--green);
+  box-shadow: 0 0 0 2px var(--green);
+}
+
+.timeline .tl_cancelled::before {
+  background: #b91c1c;
+  box-shadow: 0 0 0 2px #b91c1c;
+}
+
+.timeline time,
+.timeline span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.amount {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.payBox {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.payBox .notice {
+  margin: 0;
+}
+
+.payBox svg {
+  vertical-align: -3px;
+}
+
+.lookupForm {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.lookupForm svg {
+  vertical-align: -3px;
+}
+
+.mt {
+  margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .head {
+    flex-direction: column;
+    padding: 20px;
+  }
+  .details,
+  .inlineForm {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    padding: 18px;
+  }
+}

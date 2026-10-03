@@ -1,0 +1,188 @@
+.wrap {
+  padding-bottom: 64px;
+  background:
+    radial-gradient(1200px 500px at 10% 0%, rgba(255, 194, 26, 0.12), transparent 60%),
+    var(--bg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 0;
+  align-items: stretch;
+  max-width: 1040px;
+  margin: 24px auto 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: #fff;
+}
+
+.brand {
+  position: relative;
+  padding: 48px 44px;
+  color: #fff;
+  background: var(--grad-night);
+  overflow: hidden;
+}
+
+.brand::after {
+  content: '';
+  position: absolute;
+  right: -120px;
+  bottom: -120px;
+  width: 360px;
+  height: 360px;
+  background: url('/mandala.svg') center / contain no-repeat;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.brand h1 {
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  line-height: 1.2;
+  margin: 18px 0 10px;
+  color: #fff;
+}
+
+.om {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--grad-saffron);
+  color: #3a1d00;
+  font-size: 1.8rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.08);
+}
+
+.lead {
+  margin: 0 0 28px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.perks {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.perks li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.perks span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 194, 26, 0.16);
+  color: var(--saffron);
+}
+
+.card {
+  padding: 44px 40px 32px;
+  text-align: center;
+}
+
+.card h2 {
+  font-size: 1.6rem;
+  margin: 0 0 6px;
+}
+
+.formSlot {
+  margin-top: 22px;
+  text-align: left;
+}
+
+.back {
+  margin: 20px 0 0;
+  font-size: 0.88rem;
+}
+
+.back a {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ---------- simple single-card pages (forgot / reset) ---------- */
+.single {
+  max-width: 460px;
+  margin: 24px auto 0;
+  padding: 40px 36px 32px;
+  border-radius: var(--radius-lg);
+  background: #fff url('/mandala.svg') top right / 150px no-repeat;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.single h1 {
+  font-size: 1.6rem;
+  margin: 0 0 8px;
+}
+
+.single form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 22px;
+  text-align: left;
+}
+
+.single label {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.notice svg {
+  color: var(--green);
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+
+  .brand {
+    padding: 28px 24px;
+  }
+
+  .brand h1 {
+    margin-top: 12px;
+  }
+
+  .perks {
+    display: none;
+  }
+
+  .lead {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .card,
+  .single {
+    padding: 28px 18px 24px;
+  }
+}

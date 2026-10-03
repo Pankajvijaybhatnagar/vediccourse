@@ -3,26 +3,27 @@
 import Link from 'next/link';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import Reveal from '@/components/Reveal';
-import { SIGNS, getSign, ELEMENTS, localizeSign } from '@/lib/zodiac';
-import { getCompatibility } from '@/lib/compatibility';
+import { ELEMENTS } from '@/lib/zodiac';
 import { useLang } from '@/lib/i18n';
 import styles from '../zodiac.module.css';
 
-export default function SignDetail({ slug }) {
+/**
+ * Data comes from the server page: GET /zodiac/:sign (en + hi), GET /zodiac (for prev/next), GET /compatibility/best.
+ */
+export default function SignDetail({ slug, sign: bySign, signs, bestMatches: best }) {
   const { t, lang } = useLang();
-  const raw = getSign(slug);
-  const sign = localizeSign(raw, lang);
-  const index = SIGNS.indexOf(raw);
-  const prev = localizeSign(SIGNS[(index + 11) % 12], lang);
-  const next = localizeSign(SIGNS[(index + 1) % 12], lang);
-  const bestMatches = SIGNS.filter((s) => s.slug !== slug)
-    .map((s) => ({ sign: localizeSign(s, lang), score: getCompatibility(slug, s.slug).overall }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+  const pick = (pair) => (lang === 'hi' && pair.hi ? pair.hi : pair.en);
+  const sign = pick(bySign);
+  const list = pick(signs) ?? [];
+  const index = list.findIndex((s) => s.slug === slug);
+  const prev = list[(index + 11) % 12];
+  const next = list[(index + 1) % 12];
+  const bySlug = Object.fromEntries(list.map((s) => [s.slug, s]));
+  const bestMatches = best.map((m) => ({ sign: bySlug[m.sign.slug] ?? m.sign, score: m.overall }));
 
   const facts = [
     [{ en: 'Dates', hi: 'तिथियाँ' }, sign.dates],
-    [{ en: 'Element', hi: 'तत्व' }, sign.elementLabel, ELEMENTS[sign.element].color],
+    [{ en: 'Element', hi: 'तत्व' }, sign.elementLabel, ELEMENTS[sign.element]?.color],
     [{ en: 'Modality', hi: 'स्वभाव' }, sign.modalityLabel],
     [{ en: 'Ruling planet', hi: 'स्वामी ग्रह' }, sign.rulerLabel],
     [{ en: 'Lucky number', hi: 'शुभ अंक' }, sign.luckyNumber],
@@ -112,6 +113,7 @@ export default function SignDetail({ slug }) {
             </div>
           </Reveal>
 
+          {prev && next && (
           <nav className={styles.pager} aria-label={t({ en: 'Sign navigation', hi: 'राशि नेविगेशन' })}>
             <Link href={`/zodiac/${prev.slug}`} className="btn btn-ghost">
               ← <span className="glyph">{prev.glyph}</span> {prev.name}
@@ -123,6 +125,7 @@ export default function SignDetail({ slug }) {
               {next.name} <span className="glyph">{next.glyph}</span> →
             </Link>
           </nav>
+          )}
         </div>
       </section>
     </>

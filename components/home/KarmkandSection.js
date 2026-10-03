@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ScrollText, Package, ListChecks, PlayCircle, Check, ChevronRight } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
-import { POOJAS } from '@/lib/karmkand/poojas';
-import { SAMAGRI } from '@/lib/karmkand/samagri';
 import Reveal from '@/components/Reveal';
 import styles from './karmkandSection.module.css';
 
@@ -38,21 +36,26 @@ const STEPS = [
   },
 ];
 
-// A few steps from Ganesh Poojan, cycled in the preview to show how Pooja Mode feels.
-const PREVIEW = POOJAS.find((x) => x.slug === 'ganesh-poojan');
-const PREVIEW_STEPS = PREVIEW.steps.filter((s) => s.mantra).slice(0, 4);
-
-export default function KarmkandSection() {
+/**
+ * Home-page Karmkand explainer.
+ * @param poojas        pooja cards from GET /poojas (with stepCount)
+ * @param preview       full Ganesh Poojan from GET /poojas/ganesh-poojan, cycled to show how Pooja Mode feels (optional)
+ * @param samagriCount  total samagri items
+ */
+export default function KarmkandSection({ poojas = [], preview = null, samagriCount }) {
   const { t } = useLang();
   const [i, setI] = useState(0);
+  const previewSteps = (preview?.steps ?? []).filter((s) => s.mantra).slice(0, 4);
+  const stepsCount = previewSteps.length;
 
   useEffect(() => {
-    const id = setInterval(() => setI((n) => (n + 1) % PREVIEW_STEPS.length), 4200);
+    if (stepsCount < 2) return;
+    const id = setInterval(() => setI((n) => (n + 1) % stepsCount), 4200);
     return () => clearInterval(id);
-  }, []);
+  }, [stepsCount]);
 
-  const step = PREVIEW_STEPS[i];
-  const totalSteps = POOJAS.reduce((sum, x) => sum + x.steps.length, 0);
+  const step = previewSteps[i % Math.max(1, stepsCount)];
+  const totalSteps = poojas.reduce((sum, x) => sum + (x.stepCount ?? x.steps?.length ?? 0), 0);
 
   return (
     <section className={styles.section} aria-labelledby="karmkand-home-title">
@@ -79,10 +82,12 @@ export default function KarmkandSection() {
               <span>
                 <strong>{t({ en: 'Pooja Paddhati', hi: 'पूजा पद्धति' })}</strong>
                 <small>
-                  {t({
-                    en: `${POOJAS.length} poojas · ${totalSteps} steps with mantras & meanings`,
-                    hi: `${POOJAS.length} पूजाएँ · ${totalSteps} चरण, मंत्र एवं अर्थ सहित`,
-                  })}
+                  {poojas.length
+                    ? t({
+                        en: `${poojas.length} poojas · ${totalSteps} steps with mantras & meanings`,
+                        hi: `${poojas.length} पूजाएँ · ${totalSteps} चरण, मंत्र एवं अर्थ सहित`,
+                      })
+                    : t({ en: 'Step-by-step vidhi with mantras & meanings', hi: 'चरणबद्ध विधि, मंत्र एवं अर्थ सहित' })}
                 </small>
               </span>
               <ChevronRight size={18} className={styles.divArrow} />
@@ -93,7 +98,11 @@ export default function KarmkandSection() {
               </span>
               <span>
                 <strong>{t({ en: 'Pooja Samagri', hi: 'पूजा सामग्री' })}</strong>
-                <small>{t({ en: `${SAMAGRI.length} items · meaning, use & precautions`, hi: `${SAMAGRI.length} सामग्रियाँ · महत्व, प्रयोग एवं सावधानी` })}</small>
+                <small>
+                  {samagriCount
+                    ? t({ en: `${samagriCount} items · meaning, use & precautions`, hi: `${samagriCount} सामग्रियाँ · महत्व, प्रयोग एवं सावधानी` })
+                    : t({ en: 'Meaning, use & precautions of every item', hi: 'हर सामग्री का महत्व, प्रयोग एवं सावधानी' })}
+                </small>
               </span>
               <ChevronRight size={18} className={styles.divArrow} />
             </Link>
@@ -110,20 +119,21 @@ export default function KarmkandSection() {
         </Reveal>
 
         {/* Live preview of Pooja Mode */}
+        {step && (
         <Reveal delay={150} className={styles.preview} aria-hidden="true">
           <div className={styles.device}>
             <div className={styles.deviceBar}>
-              <span style={{ width: `${((i + 1) / PREVIEW_STEPS.length) * 100}%` }} />
+              <span style={{ width: `${(((i % stepsCount) + 1) / stepsCount) * 100}%` }} />
             </div>
             <div className={styles.deviceHead}>
               <span>
-                {PREVIEW.icon} {PREVIEW.name}
+                {preview.icon} {preview.name}
               </span>
               <small>{t({ en: 'Pooja Mode', hi: 'पूजा मोड' })}</small>
             </div>
             <div className={styles.stage} key={i}>
               <span className={styles.count}>
-                {t({ en: 'Step', hi: 'चरण' })} {i + 1} / {PREVIEW_STEPS.length}
+                {t({ en: 'Step', hi: 'चरण' })} {(i % stepsCount) + 1} / {stepsCount}
               </span>
               <h3>{step.title}</h3>
               <p className={styles.mantra}>{step.mantra.split('\n')[0]}</p>
@@ -131,10 +141,9 @@ export default function KarmkandSection() {
             <div className={styles.samagriMini}>
               <small>{t({ en: 'Samagri ready', hi: 'सामग्री तैयार' })}</small>
               <div>
-                {PREVIEW.samagri.slice(0, 6).map(([slug], n) => {
-                  const item = SAMAGRI.find((s) => s.slug === slug);
+                {(preview.samagri ?? []).slice(0, 6).map((item, n) => {
                   return (
-                    <span key={slug} className={n < 4 ? styles.ready : ''} title={item.name}>
+                    <span key={item.item} className={n < 4 ? styles.ready : ''} title={item.name}>
                       {item.icon}
                       {n < 4 && (
                         <b>
@@ -158,6 +167,7 @@ export default function KarmkandSection() {
             <small>{t({ en: '— Offered with devotion, even a leaf is accepted (Gita 9.26)', hi: '— भक्ति से अर्पित एक पत्ता भी स्वीकार्य है (गीता ९.२६)' })}</small>
           </div>
         </Reveal>
+        )}
       </div>
 
       <div className={styles.howHead}>
@@ -178,16 +188,18 @@ export default function KarmkandSection() {
         ))}
       </ol>
 
+      {poojas.length > 0 && (
       <div className={styles.poojas}>
         <span className={styles.poojasLabel}>{t({ en: 'Popular pooja vidhis:', hi: 'लोकप्रिय पूजा विधियाँ:' })}</span>
         <div className={styles.chips}>
-          {POOJAS.map((x) => (
+          {poojas.map((x) => (
             <Link key={x.slug} href={`/karmkand/pooja-paddhati/${x.slug}`}>
               <span aria-hidden="true">{x.icon}</span> {x.name.split(' (')[0]}
             </Link>
           ))}
         </div>
       </div>
+      )}
     </section>
   );
 }

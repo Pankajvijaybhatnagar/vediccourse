@@ -1,132 +1,110 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, ShieldCheck } from 'lucide-react';
+import { X, CheckCircle2 } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
+import AuthForm from '@/components/auth/AuthForm';
 import styles from './SignInModal.module.css';
 
-// Phone + OTP sign-in UI. There is no backend yet, so the OTP step is simulated.
-export default function SignInModal({ open, onClose }) {
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Global sign-in dialog (mounted once by AuthProvider; open it with useAuth().openSignIn()).
+ * Focus is trapped while open and restored to the trigger on close.
+ */
+export default function SignInModal({ open, mode, onClose, onSignedIn }) {
   const { t } = useLang();
-  const [step, setStep] = useState('phone');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [error, setError] = useState('');
-  const inputRef = useRef(null);
+  const dialogRef = useRef(null);
+  const [doneUser, setDoneUser] = useState(null);
+  const [instance, setInstance] = useState(0);
 
   useEffect(() => {
     if (!open) return;
-    setStep('phone');
-    setPhone('');
-    setOtp('');
-    setError('');
-    const id = setTimeout(() => inputRef.current?.focus(), 50);
-    const onKey = (e) => e.key === 'Escape' && onClose();
+    setDoneUser(null);
+    setInstance((i) => i + 1); // fresh form state every time it opens
+    const previouslyFocused = document.activeElement;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const focusFirst = setTimeout(() => {
+      const el = dialogRef.current?.querySelector('input, button:not([data-close])');
+      (el || dialogRef.current)?.focus();
+    }, 60);
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const nodes = [...dialogRef.current.querySelectorAll(FOCUSABLE)].filter((n) => n.offsetParent !== null || n === document.activeElement);
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => {
-      clearTimeout(id);
+      clearTimeout(focusFirst);
       window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
     };
   }, [open, onClose]);
 
+  // Close shortly after a successful sign-in so the user sees the confirmation.
+  useEffect(() => {
+    if (!doneUser) return;
+    const id = setTimeout(onClose, 1400);
+    return () => clearTimeout(id);
+  }, [doneUser, onClose]);
+
   if (!open) return null;
 
-  const sendOtp = (e) => {
-    e.preventDefault();
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      setError(t({ en: 'Enter a valid 10-digit mobile number.', hi: 'कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें।' }));
-      return;
-    }
-    setError('');
-    setStep('otp');
+  const success = (user) => {
+    setDoneUser(user || {});
+    onSignedIn?.(user);
   };
 
-  const verify = (e) => {
-    e.preventDefault();
-    if (!/^\d{4}$/.test(otp)) {
-      setError(t({ en: 'Enter the 4-digit OTP.', hi: '4 अंकों का OTP दर्ज करें।' }));
-      return;
-    }
-    setError('');
-    setStep('done');
-  };
+  const firstName = doneUser?.name?.split(' ')[0];
 
   return (
-    <div className={styles.backdrop} onClick={onClose}>
-      <div className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="signin-title" onClick={(e) => e.stopPropagation()}>
-        <button className={styles.close} onClick={onClose} aria-label={t({ en: 'Close', hi: 'बंद करें' })}>
+    <div className={styles.backdrop} onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div ref={dialogRef} className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="signin-title" tabIndex={-1}>
+        <button className={styles.close} onClick={onClose} aria-label={t({ en: 'Close', hi: 'बंद करें' })} data-close>
           <X size={18} />
         </button>
-        <div className={styles.art} aria-hidden="true">
-          <span>ॐ</span>
-        </div>
-        <h2 id="signin-title">
-          {step === 'done' ? t({ en: 'Welcome to VedicDhaam!', hi: 'वैदिकधाम में आपका स्वागत है!' }) : t({ en: 'Sign in to VedicDhaam', hi: 'वैदिकधाम में साइन इन करें' })}
-        </h2>
-        <p className="muted">
-          {step === 'done'
-            ? t({ en: 'You are signed in. Your first consultation is on us.', hi: 'आप साइन इन हो गए हैं। आपका पहला परामर्श हमारी ओर से मुफ़्त है।' })
-            : t({ en: 'Get your first consultation FREE.', hi: 'अपना पहला परामर्श मुफ़्त पाएँ।' })}
-        </p>
 
-        {step === 'phone' && (
-          <form onSubmit={sendOtp} noValidate>
-            <label htmlFor="signin-phone" className="sr-only">
-              {t({ en: 'Mobile number', hi: 'मोबाइल नंबर' })}
-            </label>
-            <div className={styles.phone}>
-              <span>+91</span>
-              <input
-                ref={inputRef}
-                id="signin-phone"
-                inputMode="numeric"
-                maxLength={10}
-                className="input"
-                placeholder={t({ en: 'Mobile number', hi: 'मोबाइल नंबर' })}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-              />
+        {doneUser ? (
+          <div className={styles.done} role="status">
+            <CheckCircle2 size={56} className={styles.doneIcon} aria-hidden="true" />
+            <h2 id="signin-title">
+              {firstName ? t({ en: `Welcome, ${firstName}!`, hi: `स्वागत है, ${firstName}!` }) : t({ en: 'Welcome to VedicDhaam!', hi: 'वैदिकधाम में आपका स्वागत है!' })}
+            </h2>
+            <p className="muted">{t({ en: 'You are signed in.', hi: 'आप साइन इन हो गए हैं।' })}</p>
+            <button className="btn btn-primary btn-block btn-lg" onClick={onClose}>
+              {t({ en: 'Continue', hi: 'आगे बढ़ें' })}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className={styles.art} aria-hidden="true">
+              <span>ॐ</span>
             </div>
-            {error && <p className="error-text">{error}</p>}
-            <button className="btn btn-primary btn-block btn-lg">{t({ en: 'Get OTP', hi: 'OTP प्राप्त करें' })}</button>
-          </form>
+            <h2 id="signin-title">{t({ en: 'Sign in to VedicDhaam', hi: 'वैदिकधाम में साइन इन करें' })}</h2>
+            <p className="muted">{t({ en: 'Get your first consultation FREE.', hi: 'अपना पहला परामर्श मुफ़्त पाएँ।' })}</p>
+            <div className={styles.body}>
+              <AuthForm key={instance} initialMode={mode} onSuccess={success} onNavigate={onClose} />
+            </div>
+          </>
         )}
-
-        {step === 'otp' && (
-          <form onSubmit={verify} noValidate>
-            <p className={styles.sent}>
-              {t({ en: 'OTP sent to', hi: 'OTP भेजा गया' })} +91 {phone}{' '}
-              <button type="button" onClick={() => setStep('phone')}>
-                {t({ en: 'Change', hi: 'बदलें' })}
-              </button>
-            </p>
-            <label htmlFor="signin-otp" className="sr-only">
-              OTP
-            </label>
-            <input
-              id="signin-otp"
-              autoFocus
-              inputMode="numeric"
-              maxLength={4}
-              className={`input ${styles.otp}`}
-              placeholder="• • • •"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-            />
-            {error && <p className="error-text">{error}</p>}
-            <button className="btn btn-primary btn-block btn-lg">{t({ en: 'Verify & Continue', hi: 'सत्यापित करें' })}</button>
-          </form>
-        )}
-
-        {step === 'done' && (
-          <button className="btn btn-primary btn-block btn-lg" onClick={onClose}>
-            {t({ en: 'Start Exploring', hi: 'शुरू करें' })}
-          </button>
-        )}
-
-        <p className={styles.secure}>
-          <ShieldCheck size={14} /> {t({ en: '100% private & secure', hi: '100% निजी और सुरक्षित' })}
-        </p>
       </div>
     </div>
   );

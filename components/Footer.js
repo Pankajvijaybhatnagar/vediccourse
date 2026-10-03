@@ -15,20 +15,20 @@ const QUICK = [
   { href: '/astrologers?focus=money', label: { en: 'Financial Astrologer', hi: 'वित्तीय ज्योतिषी' } },
   { href: '/tarot', label: { en: 'Tarot Readers', hi: 'टैरो रीडर' } },
   { href: '/numerology', label: { en: 'Numerologist', hi: 'अंकशास्त्री' } },
-  { href: '/contact', label: { en: 'Vastu Experts', hi: 'वास्तु विशेषज्ञ' } },
+  { href: '/contact?topic=vastu', label: { en: 'Vastu Experts', hi: 'वास्तु विशेषज्ञ' } },
   { href: '/contact', label: { en: 'Free Astrology Consultation', hi: 'मुफ़्त ज्योतिष परामर्श' } },
 ];
 
 const USEFUL = [
-  { href: '/contact', label: { en: 'About Us', hi: 'हमारे बारे में' } },
-  { href: '/contact', label: { en: 'Contact Us', hi: 'संपर्क करें' } },
-  { href: '/contact', label: { en: 'Astrologer Registration', hi: 'ज्योतिषी पंजीकरण' } },
-  { href: '/contact', label: { en: 'Partner With Us', hi: 'साझेदार बनें' } },
-  { href: '/contact', label: { en: 'Careers', hi: 'करियर' } },
-  { href: '/contact', label: { en: 'Refund Policy', hi: 'रिफ़ंड नीति' } },
+  { href: '/contact?topic=general', label: { en: 'About Us', hi: 'हमारे बारे में' } },
+  { href: '/contact?topic=general', label: { en: 'Contact Us', hi: 'संपर्क करें' } },
+  { href: '/contact?topic=astrologer-registration', label: { en: 'Astrologer Registration', hi: 'ज्योतिषी पंजीकरण' } },
+  { href: '/contact?topic=partnership', label: { en: 'Partner With Us', hi: 'साझेदार बनें' } },
+  { href: '/contact?topic=careers', label: { en: 'Careers', hi: 'करियर' } },
+  { href: '/contact?topic=refund', label: { en: 'Refund Policy', hi: 'रिफ़ंड नीति' } },
   { href: '/#news', label: { en: 'Media Coverage', hi: 'मीडिया कवरेज' } },
   { href: '/#videos', label: { en: 'Videos', hi: 'वीडियो' } },
-  { href: '/#blogs', label: { en: 'Blog', hi: 'ब्लॉग' } },
+  { href: '/blog', label: { en: 'Blog', hi: 'ब्लॉग' } },
 ];
 
 const SOCIAL = [

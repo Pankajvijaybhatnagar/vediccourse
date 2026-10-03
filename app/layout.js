@@ -1,5 +1,6 @@
 import { Poppins, Mukta, Yatra_One, Tiro_Devanagari_Sanskrit } from 'next/font/google';
 import { LanguageProvider } from '@/lib/i18n';
+import { AuthProvider } from '@/lib/auth';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import './globals.css';
@@ -53,15 +54,17 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-lang="en" className={`${display.variable} ${body.variable} ${deco.variable} ${sanskrit.variable}`}>
+    <html lang="en" data-lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${deco.variable} ${sanskrit.variable}`}>
       <body>
         <noscript>
           <style>{'.reveal{opacity:1!important;transform:none!important}'}</style>
         </noscript>
         <LanguageProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <AuthProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </AuthProvider>
         </LanguageProvider>
       </body>
     </html>
