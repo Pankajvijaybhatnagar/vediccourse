@@ -217,3 +217,10 @@
     margin: 0 auto;
   }
 }
+
+@media (max-width: 480px) {
+  .tabs button {
+    padding: 12px 8px;
+    font-size: 0.9rem;
+  }
+}

@@ -194,7 +194,22 @@
 
 @media (max-width: 560px) {
   .top {
-    grid-template-columns: 1fr;
-    gap: 32px;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px 20px;
+  }
+  .brand,
+  .col:last-child {
+    grid-column: 1 / -1;
+  }
+  .col {
+    gap: 9px;
+  }
+  .col a {
+    font-size: 0.9rem;
+  }
+  .bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 }

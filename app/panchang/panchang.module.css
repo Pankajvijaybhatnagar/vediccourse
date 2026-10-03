@@ -35,7 +35,7 @@
   border-color: var(--saffron);
 }
 
-.dateNav .input {
+.dateNav :global(.input) {
   width: auto;
   font-weight: 700;
 }
@@ -47,7 +47,7 @@
   color: var(--saffron-deep);
 }
 
-.cityPick .input {
+.cityPick :global(.input) {
   min-width: 220px;
   font-weight: 700;
   color: var(--text);
@@ -326,10 +326,27 @@
   .fiveLimbs {
     grid-template-columns: repeat(2, 1fr);
   }
+  .fiveLimbs > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+  .hero {
+    padding: 24px 18px;
+    background:
+      radial-gradient(circle at 85% 20%, rgba(255, 194, 26, 0.35), transparent 45%),
+      url('/mandala.svg') right -70px top -50px / 150px no-repeat,
+      var(--grad-night);
+  }
+  .sun {
+    width: 100%;
+  }
+  .sun > span {
+    flex: 1;
+    padding: 12px 10px;
+  }
   .controls {
     justify-content: center;
   }
-  .cityPick .input {
+  .cityPick :global(.input) {
     min-width: 0;
   }
 }

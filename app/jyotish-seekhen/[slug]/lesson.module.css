@@ -388,6 +388,8 @@
 
 .qText {
   display: block;
+  float: left;
+  width: 100%;
   padding: 0;
   margin-bottom: 14px;
   font-size: 1.08rem;
@@ -691,7 +693,22 @@
   .question {
     padding: 16px;
   }
+  .table {
+    font-size: 0.86rem;
+  }
+  .table thead th,
+  .table tbody th,
+  .table td {
+    padding: 8px 9px;
+  }
+  .table td {
+    min-width: 70px;
+  }
   .summary {
     padding: 20px;
   }
+}
+
+.qText + * {
+  clear: both;
 }

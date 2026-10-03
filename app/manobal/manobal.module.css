@@ -626,6 +626,10 @@ html[data-lang='hi'] .heroText h1 {
   .heroStats {
     justify-content: center;
   }
+  .toolTabs {
+    -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
   .heroArt {
     min-height: 240px;
     order: -1;
@@ -680,5 +684,18 @@ html[data-lang='hi'] .heroText h1 {
   }
   .block {
     margin-top: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroStats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .heroStats b {
+    font-size: 1.3rem;
   }
 }

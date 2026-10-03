@@ -147,8 +147,14 @@
   text-align: center;
 }
 
+.tableCard,
+.chartCard {
+  min-width: 0;
+}
+
 .tableWrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -355,7 +361,7 @@
 
 @media (max-width: 1100px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .chartCard {
     max-width: 520px;
@@ -371,9 +377,38 @@
   .fields,
   .keyFacts,
   .grid3 {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .table {
+    font-size: 0.85rem;
+  }
+  .table th,
+  .table td {
+    padding: 8px 6px;
+  }
+  .table td:nth-child(4) {
+    white-space: normal;
+  }
+  .table td:nth-child(4) small {
+    display: block;
+  }
+  .keyFacts {
+    flex: 1 1 100%;
   }
   .summary {
     padding: 22px;
+  }
+}
+
+/* The chart SVG scales down on phones; enlarge its text so it stays readable. */
+@media (max-width: 560px) {
+  .signNum {
+    font-size: 16px;
+  }
+  .ascLabel {
+    font-size: 14px;
+  }
+  .planetText {
+    font-size: 19px;
   }
 }

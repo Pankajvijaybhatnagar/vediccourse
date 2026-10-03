@@ -609,4 +609,12 @@
   .mantraText {
     font-size: 1.12rem;
   }
+  .table {
+    min-width: 0;
+    font-size: 0.88rem;
+  }
+  .table th,
+  .table td {
+    padding: 9px 10px;
+  }
 }

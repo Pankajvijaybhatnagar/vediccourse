@@ -118,4 +118,7 @@
   .numbers {
     grid-template-columns: repeat(2, 1fr);
   }
+  .numbers > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }

@@ -275,3 +275,17 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .pager {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  .pager :global(.btn) {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 0.82rem;
+    justify-content: center;
+    white-space: nowrap;
+  }
+}

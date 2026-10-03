@@ -55,6 +55,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-lang="en" className={`${display.variable} ${body.variable} ${deco.variable} ${sanskrit.variable}`}>
       <body>
+        <noscript>
+          <style>{'.reveal{opacity:1!important;transform:none!important}'}</style>
+        </noscript>
         <LanguageProvider>
           <Header />
           <main>{children}</main>
