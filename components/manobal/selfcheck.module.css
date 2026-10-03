@@ -224,3 +224,19 @@
     font-size: 0.9rem;
   }
 }
+
+/* ---------- API states ---------- */
+.loadState {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.errorText {
+  margin: 0 0 14px;
+  color: var(--vermilion);
+  font-size: 0.95rem;
+}

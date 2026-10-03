@@ -1,4 +1,5 @@
 import PageHeader from '@/components/PageHeader';
+import { apiGet } from '@/lib/server-api';
 import ZodiacGrid from './ZodiacGrid';
 
 export const metadata = {
@@ -6,7 +7,12 @@ export const metadata = {
   description: 'Explore all twelve zodiac signs (rashi): elements, ruling planets, traits, strengths and weaknesses.',
 };
 
-export default function ZodiacPage() {
+// Sign profiles rarely change: revalidate once a day.
+const DAY = 86400;
+
+export default async function ZodiacPage() {
+  const [en, hi] = await Promise.all([apiGet('/zodiac?lang=en', { revalidate: DAY }), apiGet('/zodiac?lang=hi', { revalidate: DAY })]);
+
   return (
     <>
       <PageHeader
@@ -19,7 +25,7 @@ export default function ZodiacPage() {
           hi: 'हर राशि की अपनी विशेष ऊर्जा होती है जो उसके तत्व, स्वभाव और स्वामी ग्रह से बनती है। अपनी राशि खोजें और उसकी विशेषताएँ जानें।',
         }}
       />
-      <ZodiacGrid />
+      <ZodiacGrid signs={{ en: en?.data ?? [], hi: hi?.data ?? [] }} />
     </>
   );
 }

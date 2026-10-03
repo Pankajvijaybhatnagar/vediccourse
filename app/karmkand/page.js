@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 import Reveal from '@/components/Reveal';
-import { POOJAS } from '@/lib/karmkand/poojas';
-import { SAMAGRI, SAMAGRI_CATEGORIES } from '@/lib/karmkand/samagri';
+import { getPoojas, getSamagriList, getSamagriCategories } from './data';
 import PoojaCard from './PoojaCard';
 import styles from './karmkand.module.css';
 
@@ -39,7 +38,9 @@ const UPCHAR = [
   ['१६', 'पुष्पांजलि', 'पुष्पांजलि और नमस्कार', '—'],
 ];
 
-export default function KarmkandPage() {
+export default async function KarmkandPage() {
+  const [poojas, samagri, samagriCategories] = await Promise.all([getPoojas(), getSamagriList(), getSamagriCategories()]);
+
   return (
     <>
       <PageHeader
@@ -103,9 +104,9 @@ export default function KarmkandPage() {
               <Link href="/karmkand/pooja-paddhati" className={`${styles.division} ${styles.divPaddhati}`}>
                 <span className={styles.divIcon}>📜</span>
                 <h2>पूजा पद्धति</h2>
-                <p>दैनिक पूजा से लेकर रुद्राभिषेक और गृह प्रवेश तक — {POOJAS.length} पूजाओं की चरणबद्ध विधि, मंत्र, अर्थ, नियम और लाभ।</p>
+                <p>दैनिक पूजा से लेकर रुद्राभिषेक और गृह प्रवेश तक — {poojas.length} पूजाओं की चरणबद्ध विधि, मंत्र, अर्थ, नियम और लाभ।</p>
                 <div className={styles.divList}>
-                  {POOJAS.slice(0, 5).map((p) => (
+                  {poojas.slice(0, 5).map((p) => (
                     <span key={p.slug}>{p.name.split(' (')[0]}</span>
                   ))}
                   <span>और भी…</span>
@@ -115,10 +116,10 @@ export default function KarmkandPage() {
               <Link href="/karmkand/pooja-samagri" className={`${styles.division} ${styles.divSamagri}`}>
                 <span className={styles.divIcon}>🪔</span>
                 <h2>पूजा सामग्री</h2>
-                <p>{SAMAGRI.length} पूजा सामग्रियों का कोश — प्रत्येक वस्तु का आध्यात्मिक महत्व, प्रयोग की सही विधि और आवश्यक सावधानियाँ।</p>
+                <p>{samagri.length} पूजा सामग्रियों का कोश — प्रत्येक वस्तु का आध्यात्मिक महत्व, प्रयोग की सही विधि और आवश्यक सावधानियाँ।</p>
                 <div className={styles.divList}>
-                  {SAMAGRI_CATEGORIES.slice(0, 5).map((c) => (
-                    <span key={c.id}>
+                  {samagriCategories.slice(0, 5).map((c) => (
+                    <span key={c.key}>
                       {c.icon} {c.name}
                     </span>
                   ))}
@@ -223,7 +224,7 @@ export default function KarmkandPage() {
               </Link>
             </div>
             <div className={styles.poojaGrid}>
-              {POOJAS.slice(0, 6).map((p, i) => (
+              {poojas.slice(0, 6).map((p, i) => (
                 <Reveal key={p.slug} delay={(i % 3) * 80}>
                   <PoojaCard pooja={p} />
                 </Reveal>

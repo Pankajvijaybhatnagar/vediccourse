@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { lifePath, expression, soulUrge, personality, mulank, MEANINGS } from '@/lib/numerology';
 import { useLang } from '@/lib/i18n';
+import { api } from '@/lib/api';
+import { ErrorState } from '@/components/astro/States';
 import styles from './numerology.module.css';
 
 const CORE = [
@@ -20,8 +21,10 @@ export default function NumerologyClient() {
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
   const [active, setActive] = useState('mulank');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const next = {};
     if (!/[a-z]/i.test(name)) next.name = { en: 'Please enter your full name in English letters.', hi: 'कृपया अपना पूरा नाम अंग्रेज़ी अक्षरों में लिखें।' };
@@ -29,17 +32,28 @@ export default function NumerologyClient() {
     setErrors(next);
     if (Object.keys(next).length) return;
 
-    setResult({
-      mulank: mulank(date),
-      lifePath: lifePath(date),
-      expression: expression(name),
-      soulUrge: soulUrge(name) ?? expression(name),
-      personality: personality(name) ?? expression(name),
-    });
-    setActive('mulank');
+    setLoading(true);
+    setError(null);
+    try {
+      const { data } = await api('/numerology/calculate', { method: 'POST', body: { dob: date, name: name.trim() }, auth: false });
+      // Names without vowels/consonants have no soul-urge/personality number; fall back to the name number.
+      setResult({
+        mulank: data.mulank,
+        lifePath: data.lifePath,
+        expression: data.expression,
+        soulUrge: data.soulUrge ?? data.expression,
+        personality: data.personality ?? data.expression,
+      });
+      setActive('mulank');
+    } catch (err) {
+      setResult(null);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const current = result && MEANINGS[result[active]];
+  const current = result?.[active]?.meaning;
 
   return (
     <section className={styles.section}>
@@ -67,10 +81,16 @@ export default function NumerologyClient() {
             />
             {errors.date && <span className="error-text">{t(errors.date)}</span>}
           </div>
-          <button type="submit" className={`btn btn-primary btn-lg ${styles.submit}`}>
-            ✦ {t({ en: 'Reveal My Numbers', hi: 'मेरे अंक देखें' })}
+          <button type="submit" className={`btn btn-primary btn-lg ${styles.submit}`} disabled={loading} aria-busy={loading}>
+            ✦ {loading ? t({ en: 'Calculating…', hi: 'गणना हो रही है…' }) : t({ en: 'Reveal My Numbers', hi: 'मेरे अंक देखें' })}
           </button>
         </form>
+
+        {error && (
+          <div style={{ marginTop: 24 }}>
+            <ErrorState error={error} onRetry={() => submit({ preventDefault() {} })} />
+          </div>
+        )}
 
         {result && (
           <div className={styles.result}>
@@ -84,7 +104,7 @@ export default function NumerologyClient() {
                   style={{ animationDelay: `${i * 80}ms` }}
                   onClick={() => setActive(c.key)}
                 >
-                  <span className={styles.numValue}>{result[c.key]}</span>
+                  <span className={styles.numValue}>{result[c.key]?.number ?? '—'}</span>
                   <strong>{t(c.label)}</strong>
                   <small>{t(c.sub)}</small>
                 </button>
@@ -92,15 +112,15 @@ export default function NumerologyClient() {
             </div>
 
             <article className={`card ${styles.detail} mandala-bg`} key={active + lang} role="tabpanel">
-              <div className={`${styles.detailNum} gold-text`}>{result[active]}</div>
+              <div className={`${styles.detailNum} gold-text`}>{result[active]?.number ?? '—'}</div>
               <div>
                 <span className="eyebrow" style={{ marginBottom: 6 }}>
                   {t(CORE.find((c) => c.key === active).label)}
                 </span>
-                <h2>{t(current.title)}</h2>
-                <p className="muted">{t(current.text)}</p>
+                <h2>{current ? t(current.title) : '—'}</h2>
+                {current && <p className="muted">{t(current.text)}</p>}
                 <div className={styles.keywords}>
-                  {current.keywords[lang].map((k) => (
+                  {(current?.keywords?.[lang] ?? current?.keywords?.en ?? []).map((k) => (
                     <span key={k} className="pill">
                       {k}
                     </span>

@@ -1,7 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useLang } from '@/lib/i18n';
-import useStoredState, { todayKey } from '@/lib/useStoredState';
+import { todayKey } from '@/lib/useStoredState';
+import useJournal from './useJournal';
+import JournalSyncBar from './JournalSyncBar';
 import styles from './tools.module.css';
 
 const MOODS = [
@@ -23,13 +26,53 @@ const TAGS = [
   { id: 'stress', label: { en: 'Stressful day', hi: 'तनावपूर्ण दिन' } },
 ];
 
+const TAG_IDS = new Set(TAGS.map((tg) => tg.id));
+const EMPTY = { mood: 0, tags: [], note: '' };
+
+/** Local { 'YYYY-MM-DD': { mood, tags, note } } → API entries (days without a mood are skipped). */
+const toEntries = (log) =>
+  Object.entries(log || {})
+    .filter(([date, v]) => /^\d{4}-\d{2}-\d{2}$/.test(date) && v?.mood >= 1 && v.mood <= 5)
+    .map(([date, v]) => ({ date, data: clean(v) }));
+
+const clean = (v) => ({
+  mood: v.mood,
+  tags: (v.tags || []).filter((x) => TAG_IDS.has(x)),
+  ...(v.note?.trim() && { note: v.note.trim().slice(0, 300) }),
+});
+
 export default function MoodTracker() {
   const { t, lang } = useLang();
-  const [log, setLog] = useStoredState('vedicdhaam-manobal-mood', {});
+  const journal = useJournal('mood', 'vedicdhaam-manobal-mood', {}, toEntries);
+  const { synced } = journal;
   const today = todayKey();
-  const entry = log[today] || { mood: 0, tags: [], note: '' };
 
-  const update = (patch) => setLog((l) => ({ ...l, [today]: { ...entry, ...(l[today] || {}), ...patch } }));
+  const log = synced ? Object.fromEntries(journal.entries.map((e) => [e.date, e.data])) : journal.local;
+  const savedToday = log[today];
+
+  // Signed-in: edit today's entry as a draft; mood/tag clicks save at once, the note saves on blur.
+  const [draft, setDraft] = useState(null);
+  useEffect(() => {
+    if (synced && journal.ready) setDraft(savedToday ? { ...EMPTY, ...savedToday } : null);
+    // Re-seed only when today's saved entry changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [synced, journal.ready, savedToday?.mood, savedToday?.note, (savedToday?.tags || []).join()]);
+
+  const entry = { ...EMPTY, ...((synced ? draft || savedToday : savedToday) || {}) };
+
+  const persist = (next) => {
+    if (next.mood >= 1) journal.save(today, clean(next)).catch(() => {});
+  };
+
+  const update = (patch, { saveNow = true } = {}) => {
+    if (!synced) {
+      journal.setLocal((l) => ({ ...l, [today]: { ...EMPTY, ...(l[today] || {}), ...patch } }));
+      return;
+    }
+    const next = { ...entry, ...patch };
+    setDraft(next);
+    if (saveNow) persist(next);
+  };
 
   // Last 14 days for the chart.
   const days = Array.from({ length: 14 }, (_, i) => {
@@ -48,6 +91,7 @@ export default function MoodTracker() {
 
   return (
     <div className={styles.tool}>
+      <JournalSyncBar journal={journal} />
       <h4 className={styles.toolTitle}>{t({ en: 'How are you feeling today?', hi: 'आज आप कैसा अनुभव कर रहे हैं?' })}</h4>
       <div className={styles.moods} role="radiogroup" aria-label={t({ en: 'Mood', hi: 'मनोदशा' })}>
         {MOODS.map((m) => (
@@ -72,7 +116,14 @@ export default function MoodTracker() {
       <div className={styles.row2} style={{ alignItems: 'end' }}>
         <div className="field">
           <label htmlFor="mood-note">{t({ en: 'One line about today (optional)', hi: 'आज के बारे में एक पंक्ति (वैकल्पिक)' })}</label>
-          <input id="mood-note" className="input" value={entry.note || ''} onChange={(e) => update({ note: e.target.value })} />
+          <input
+            id="mood-note"
+            className="input"
+            maxLength={300}
+            value={entry.note || ''}
+            onChange={(e) => update({ note: e.target.value }, { saveNow: false })}
+            onBlur={() => synced && draft && persist(draft)}
+          />
         </div>
       </div>
 

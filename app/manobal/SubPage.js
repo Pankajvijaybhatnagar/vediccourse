@@ -24,7 +24,7 @@ const COPY = {
   },
 };
 
-export default function SubPage({ kind }) {
+export default function SubPage({ kind, initialData = null }) {
   const { t } = useLang();
   const c = COPY[kind];
   return (
@@ -39,7 +39,7 @@ export default function SubPage({ kind }) {
           <p>{t(c.lead)}</p>
         </header>
         <HelpBanner compact />
-        <div className={styles.panel}>{kind === 'career' ? <CareerCompass /> : <SelfCheck />}</div>
+        <div className={styles.panel}>{kind === 'career' ? <CareerCompass initialData={initialData} /> : <SelfCheck initialData={initialData} />}</div>
         {kind === 'career' && (
           <div className={styles.block}>
             <HelpBanner />

@@ -733,3 +733,50 @@
     padding: 9px 8px;
   }
 }
+
+/* ---------- API-backed tools ---------- */
+.placeField {
+  margin-top: 14px;
+}
+
+.placeLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.errorText {
+  margin: 12px 0 0;
+  color: var(--vermilion);
+  font-size: 0.92rem;
+}
+
+.syncBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--bg-soft);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.syncBar button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--saffron-deep);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.syncBar button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

@@ -1,20 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, ChevronDown, Languages, Menu, X, Sun, CalendarDays, Sparkles } from 'lucide-react';
+import { ChevronDown, Languages, LogOut, Menu, X } from 'lucide-react';
 import { NAV } from '@/lib/nav';
 import { useLang } from '@/lib/i18n';
+import { useAuth, displayName } from '@/lib/auth';
+import NotificationBell from './auth/NotificationBell';
+import UserMenu, { ACCOUNT_LINKS, Avatar } from './auth/UserMenu';
 import Logo from './Logo';
-import SignInModal from './SignInModal';
 import styles from './Header.module.css';
-
-const NOTIFICATIONS = [
-  { icon: Sun, text: { en: "Your daily horoscope is ready. See what today holds!", hi: 'आपका आज का राशिफल तैयार है। देखें आज क्या खास है!' }, href: '/horoscope', time: { en: 'Just now', hi: 'अभी' } },
-  { icon: CalendarDays, text: { en: "Check today's Panchang, Rahu Kaal and auspicious muhurat.", hi: 'आज का पंचांग, राहु काल और शुभ मुहूर्त देखें।' }, href: '/panchang', time: { en: '1h ago', hi: '1 घंटा पहले' } },
-  { icon: Sparkles, text: { en: 'New: Free Kundli matching for marriage.', hi: 'नया: विवाह के लिए मुफ़्त कुंडली मिलान।' }, href: '/compatibility', time: { en: 'Today', hi: 'आज' } },
-];
 
 function LangToggle({ className = '' }) {
   const { lang, setLang } = useLang();
@@ -34,12 +30,10 @@ function LangToggle({ className = '' }) {
 export default function Header() {
   const pathname = usePathname();
   const { t } = useLang();
+  const { user, signOut, openSignIn } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState(null);
-  const [bellOpen, setBellOpen] = useState(false);
-  const [signIn, setSignIn] = useState(false);
-  const bellRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -50,7 +44,6 @@ export default function Header() {
 
   useEffect(() => {
     setMenuOpen(false);
-    setBellOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -58,19 +51,9 @@ export default function Header() {
   }, [menuOpen]);
 
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === 'Escape') {
-        setMenuOpen(false);
-        setBellOpen(false);
-      }
-    };
-    const onClick = (e) => bellRef.current && !bellRef.current.contains(e.target) && setBellOpen(false);
+    const onKey = (e) => e.key === 'Escape' && setMenuOpen(false);
     window.addEventListener('keydown', onKey);
-    document.addEventListener('mousedown', onClick);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.removeEventListener('mousedown', onClick);
-    };
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const isActive = (item) => {
@@ -88,39 +71,14 @@ export default function Header() {
           <Logo />
           <div className={styles.actions}>
             <LangToggle className={styles.hideXs} />
-            <div className={styles.bellWrap} ref={bellRef}>
-              <button
-                className={styles.iconBtn}
-                aria-label={t({ en: 'Notifications', hi: 'सूचनाएँ' })}
-                aria-expanded={bellOpen}
-                onClick={() => setBellOpen((o) => !o)}
-              >
-                <Bell size={18} />
-                <span className={styles.dot} />
+            <NotificationBell />
+            {user ? (
+              <UserMenu />
+            ) : (
+              <button className={`btn btn-primary btn-sm ${styles.signIn}`} onClick={() => openSignIn()}>
+                {t({ en: 'Sign In', hi: 'साइन इन' })}
               </button>
-              {bellOpen && (
-                <div className={styles.bellMenu} role="menu">
-                  <p className={styles.bellTitle}>{t({ en: 'Notifications', hi: 'सूचनाएँ' })}</p>
-                  {NOTIFICATIONS.map((n, i) => {
-                    const Icon = n.icon;
-                    return (
-                      <Link key={i} href={n.href} className={styles.note} role="menuitem">
-                        <span className={styles.noteIcon}>
-                          <Icon size={16} />
-                        </span>
-                        <span>
-                          {t(n.text)}
-                          <small>{t(n.time)}</small>
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-            <button className={`btn btn-primary btn-sm ${styles.signIn}`} onClick={() => setSignIn(true)}>
-              {t({ en: 'Sign In', hi: 'साइन इन' })}
-            </button>
+            )}
             <button
               className={`${styles.iconBtn} ${styles.burger}`}
               onClick={() => setMenuOpen(true)}
@@ -205,19 +163,46 @@ export default function Header() {
             )
           )}
         </nav>
-        <button
-          className="btn btn-primary btn-block"
-          tabIndex={menuOpen ? 0 : -1}
-          onClick={() => {
-            setMenuOpen(false);
-            setSignIn(true);
-          }}
-        >
-          {t({ en: 'Sign In', hi: 'साइन इन' })}
-        </button>
+        {user ? (
+          <div className={styles.drawerUser}>
+            <div className={styles.userHead}>
+              <Avatar user={user} size={42} />
+              <div>
+                <strong>{user.name || displayName(user)}</strong>
+                <small>{user.email || (user.phone ? `+91 ${user.phone}` : '')}</small>
+              </div>
+            </div>
+            {ACCOUNT_LINKS.map(({ href, icon: Icon, label }) => (
+              <Link key={href} href={href} className={styles.userLink} tabIndex={menuOpen ? 0 : -1} onClick={() => setMenuOpen(false)}>
+                <Icon size={16} aria-hidden="true" /> {t(label)}
+              </Link>
+            ))}
+            <button
+              type="button"
+              className={`${styles.userLink} ${styles.userSignOut}`}
+              tabIndex={menuOpen ? 0 : -1}
+              onClick={() => {
+                setMenuOpen(false);
+                signOut();
+              }}
+            >
+              <LogOut size={16} aria-hidden="true" /> {t({ en: 'Sign out', hi: 'साइन आउट' })}
+            </button>
+          </div>
+        ) : (
+          <button
+            className="btn btn-primary btn-block"
+            tabIndex={menuOpen ? 0 : -1}
+            onClick={() => {
+              setMenuOpen(false);
+              openSignIn();
+            }}
+          >
+            {t({ en: 'Sign In', hi: 'साइन इन' })}
+          </button>
+        )}
       </aside>
 
-      <SignInModal open={signIn} onClose={() => setSignIn(false)} />
     </>
   );
 }
