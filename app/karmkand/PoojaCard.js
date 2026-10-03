@@ -21,7 +21,7 @@ export default function PoojaCard({ pooja }) {
           <span>
             <Clock size={13} /> {pooja.duration}
           </span>
-          <span>{pooja.stepCount ?? pooja.steps?.length ?? 0} चरण</span>
+          <span>{pooja.steps.length} चरण</span>
         </span>
       </span>
     </Link>

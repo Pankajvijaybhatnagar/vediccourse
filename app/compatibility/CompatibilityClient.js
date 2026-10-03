@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowLeftRight } from 'lucide-react';
 import { SIGNS, getSign, ELEMENTS, localizeSign } from '@/lib/zodiac';
+import { getCompatibility } from '@/lib/compatibility';
 import { useLang } from '@/lib/i18n';
-import { api } from '@/lib/api';
-import { ErrorState, Loading } from '@/components/astro/States';
 import styles from './compatibility.module.css';
 
 function SignSelect({ id, label, value, onChange }) {
@@ -92,72 +91,46 @@ export default function CompatibilityClient() {
   const [a, setA] = useState(valid(params.get('a'), 'leo'));
   const [b, setB] = useState(valid(params.get('b'), 'libra'));
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const resultRef = useRef(null);
-  const statusRef = useRef(null);
-
-  const fetchMatch = async (sa, sb, scroll) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api(`/compatibility?a=${sa}&b=${sb}`, { auth: false });
-      setResult(data);
-      if (scroll) requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
-    } catch (err) {
-      setResult(null);
-      setError(err);
-      requestAnimationFrame(() => statusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Auto-reveal when arriving from a shared link with both signs.
   useEffect(() => {
-    if (params.get('a') && params.get('b')) fetchMatch(a, b, false);
+    if (params.get('a') && params.get('b')) setResult(getCompatibility(a, b));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const reveal = () => fetchMatch(a, b, true);
-
-  const reset = () => {
-    setResult(null);
-    setError(null);
+  const reveal = () => {
+    setResult(getCompatibility(a, b));
+    requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
   };
 
   const swap = () => {
     setA(b);
     setB(a);
-    reset();
+    setResult(null);
   };
 
-  const ra = result && localizeSign(getSign(result.a.slug), lang);
-  const rb = result && localizeSign(getSign(result.b.slug), lang);
+  const ra = result && localizeSign(result.a, lang);
+  const rb = result && localizeSign(result.b, lang);
 
   return (
     <section className={styles.section}>
       <div className="container">
         <div className={`card card-glow ${styles.picker}`}>
-          <SignSelect id="sign-a" label={{ en: 'Your sign', hi: 'आपकी राशि' }} value={a} onChange={(v) => { setA(v); reset(); }} />
+          <SignSelect id="sign-a" label={{ en: 'Your sign', hi: 'आपकी राशि' }} value={a} onChange={(v) => { setA(v); setResult(null); }} />
           <button className={styles.swap} onClick={swap} aria-label={t({ en: 'Swap signs', hi: 'राशियाँ बदलें' })}>
             <span className={styles.heart}>♥</span>
             <small>
               <ArrowLeftRight size={13} /> {t({ en: 'swap', hi: 'बदलें' })}
             </small>
           </button>
-          <SignSelect id="sign-b" label={{ en: "Partner's sign", hi: 'साथी की राशि' }} value={b} onChange={(v) => { setB(v); reset(); }} />
+          <SignSelect id="sign-b" label={{ en: "Partner's sign", hi: 'साथी की राशि' }} value={b} onChange={(v) => { setB(v); setResult(null); }} />
         </div>
 
         <div className={styles.revealRow}>
-          <button className="btn btn-primary btn-lg" onClick={reveal} disabled={loading} aria-busy={loading}>
-            ✦ {loading ? t({ en: 'Reading the stars…', hi: 'सितारे पढ़े जा रहे हैं…' }) : t({ en: 'Reveal Compatibility', hi: 'अनुकूलता देखें' })}
+          <button className="btn btn-primary btn-lg" onClick={reveal}>
+            ✦ {t({ en: 'Reveal Compatibility', hi: 'अनुकूलता देखें' })}
           </button>
-        </div>
-
-        <div ref={statusRef}>
-          {loading && !result && <Loading />}
-          <ErrorState error={error} onRetry={reveal} />
         </div>
 
         {result && (

@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ELEMENTS, ELEMENT_HI } from '@/lib/zodiac';
+import { SIGNS, ELEMENTS, ELEMENT_HI, localizeSign } from '@/lib/zodiac';
 import { useLang } from '@/lib/i18n';
-import { EmptyState } from '@/components/astro/States';
 import styles from './zodiac.module.css';
 
 const ELEMENT_DESC = {
@@ -14,12 +13,10 @@ const ELEMENT_DESC = {
   Water: { en: 'Intuitive, emotional and deep', hi: 'अंतर्ज्ञानी, भावुक और गहरी' },
 };
 
-/** @param {{ signs: { en: object[], hi: object[] } }} props  localized sign lists from GET /zodiac?lang= */
-export default function ZodiacGrid({ signs }) {
+export default function ZodiacGrid() {
   const { t, lang } = useLang();
   const [filter, setFilter] = useState('All');
-  const list = (lang === 'hi' && signs.hi.length ? signs.hi : signs.en) ?? [];
-  const visible = filter === 'All' ? list : list.filter((s) => s.element === filter);
+  const visible = filter === 'All' ? SIGNS : SIGNS.filter((s) => s.element === filter);
 
   return (
     <section className={styles.section}>
@@ -35,16 +32,15 @@ export default function ZodiacGrid({ signs }) {
           {filter !== 'All' && <p className={`${styles.filterNote} fade-up`}>{t(ELEMENT_DESC[filter])}</p>}
         </div>
 
-        {!list.length && <EmptyState title={{ en: 'Zodiac signs are unavailable right now.', hi: 'राशियाँ अभी उपलब्ध नहीं हैं।' }} />}
-
         <div className={styles.grid}>
-          {visible.map((s, i) => {
+          {visible.map((raw, i) => {
+            const s = localizeSign(raw, lang);
             return (
               <Link
                 key={s.slug}
                 href={`/zodiac/${s.slug}`}
                 className={`card card-hover ${styles.card} fade-up`}
-                style={{ '--accent': ELEMENTS[s.element]?.color, animationDelay: `${i * 50}ms` }}
+                style={{ '--accent': ELEMENTS[s.element].color, animationDelay: `${i * 50}ms` }}
               >
                 <div className={styles.cardTop}>
                   <span className={`${styles.glyph} glyph`}>{s.glyph}</span>

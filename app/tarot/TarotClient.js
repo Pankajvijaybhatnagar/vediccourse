@@ -1,12 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import Link from 'next/link';
-import { BookmarkPlus, Check } from 'lucide-react';
+import { useState } from 'react';
+import { drawCards, SPREAD_POSITIONS } from '@/lib/tarot';
 import { useLang } from '@/lib/i18n';
-import { api } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
-import { ErrorState } from '@/components/astro/States';
 import styles from './tarot.module.css';
 
 function CardBack() {
@@ -22,57 +18,22 @@ function CardBack() {
   );
 }
 
-const SHUFFLE_MS = 1200;
-const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-
 export default function TarotClient() {
   const { t } = useLang();
-  const { user, openSignIn } = useAuth();
   const [question, setQuestion] = useState('');
   const [cards, setCards] = useState(null);
   const [flipped, setFlipped] = useState([false, false, false]);
   const [shuffling, setShuffling] = useState(false);
-  const [error, setError] = useState(null);
-  const [save, setSave] = useState({ state: 'idle', error: null }); // idle | saving | saved
-  const spreadRef = useRef(null);
-  spreadRef.current = { cards, question };
 
-  // Cards are drawn by the API; the shuffle animation runs for at least SHUFFLE_MS either way.
-  const draw = async () => {
+  const draw = () => {
     setShuffling(true);
     setCards(null);
-    setError(null);
-    setSave({ state: 'idle', error: null });
     setFlipped([false, false, false]);
-    try {
-      const [res] = await Promise.all([
-        api('/tarot/draw', { method: 'POST', body: { count: 3, ...(question.trim() && { question: question.trim() }) } }),
-        wait(SHUFFLE_MS),
-      ]);
-      setCards(res.data.cards);
-    } catch (err) {
-      setError(err);
-    } finally {
+    setTimeout(() => {
+      setCards(drawCards(3));
       setShuffling(false);
-    }
+    }, 1200);
   };
-
-  const saveReading = async () => {
-    const { cards: spread, question: q } = spreadRef.current;
-    if (!spread) return;
-    setSave({ state: 'saving', error: null });
-    try {
-      await api('/tarot/readings', {
-        method: 'POST',
-        body: { ...(q.trim() && { question: q.trim() }), cards: spread.map((c) => ({ numeral: c.numeral, isReversed: Boolean(c.isReversed) })) },
-      });
-      setSave({ state: 'saved', error: null });
-    } catch (err) {
-      setSave({ state: 'idle', error: err });
-    }
-  };
-
-  const onSave = () => (user ? saveReading() : openSignIn({ onSuccess: () => saveReading() }));
 
   const flip = (i) => setFlipped((f) => f.map((v, j) => (j === i ? true : v)));
   const allFlipped = cards && flipped.every(Boolean);
@@ -100,10 +61,9 @@ export default function TarotClient() {
                 disabled={shuffling}
               />
             </div>
-            <button className="btn btn-primary btn-lg" onClick={draw} disabled={shuffling} aria-busy={shuffling}>
+            <button className="btn btn-primary btn-lg" onClick={draw} disabled={shuffling}>
               {shuffling ? t({ en: 'Shuffling the deck…', hi: 'पत्ते फेंटे जा रहे हैं…' }) : `✦ ${t({ en: 'Shuffle & Draw', hi: 'पत्ते फेंटें और चुनें' })}`}
             </button>
-            {error && <ErrorState error={error} onRetry={draw} compact />}
           </div>
         )}
 
@@ -116,11 +76,11 @@ export default function TarotClient() {
             <div className={styles.spread}>
               {cards.map((card, i) => (
                 <div key={card.numeral} className={styles.slot} style={{ animationDelay: `${i * 150}ms` }}>
-                  <span className={styles.position}>{card.position ? t(card.position) : ''}</span>
+                  <span className={styles.position}>{t(SPREAD_POSITIONS[i].label)}</span>
                   <button
                     className={`${styles.tarotCard} ${flipped[i] ? styles.flipped : ''}`}
                     onClick={() => flip(i)}
-                    aria-label={flipped[i] ? t(card.name) : t({ en: `Reveal ${card.position?.en ?? ''} card`, hi: `${card.position?.hi ?? ''} का कार्ड पलटें` })}
+                    aria-label={flipped[i] ? t(card.name) : t({ en: `Reveal ${SPREAD_POSITIONS[i].label.en} card`, hi: `${SPREAD_POSITIONS[i].label.hi} का कार्ड पलटें` })}
                     disabled={flipped[i]}
                   >
                     <div className={styles.inner}>
@@ -136,7 +96,7 @@ export default function TarotClient() {
                       </div>
                     </div>
                   </button>
-                  <small className={styles.hint}>{card.positionHint ? t(card.positionHint) : ''}</small>
+                  <small className={styles.hint}>{t(SPREAD_POSITIONS[i].hint)}</small>
                 </div>
               ))}
             </div>
@@ -145,12 +105,12 @@ export default function TarotClient() {
               {cards.map((card, i) =>
                 flipped[i] ? (
                   <article key={card.numeral} className={`card ${styles.meaning} fade-up`}>
-                    <span className={styles.position}>{card.position ? t(card.position) : ''}</span>
+                    <span className={styles.position}>{t(SPREAD_POSITIONS[i].label)}</span>
                     <h3>
                       {t(card.name)}
                       {card.isReversed && <small className={styles.revTag}>{t({ en: 'Reversed', hi: 'उलटा' })}</small>}
                     </h3>
-                    <p>{t(card.meaning ?? (card.isReversed ? card.reversed : card.upright))}</p>
+                    <p>{t(card.isReversed ? card.reversed : card.upright)}</p>
                   </article>
                 ) : null
               )}
@@ -158,30 +118,9 @@ export default function TarotClient() {
 
             {allFlipped && (
               <div className={`${styles.again} fade-up`}>
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                  {save.state === 'saved' ? (
-                    <Link href="/account?tab=readings" className="btn btn-primary btn-lg">
-                      <Check size={18} aria-hidden="true" /> {t({ en: 'Saved · View my readings', hi: 'सहेजा गया · मेरी रीडिंग देखें' })}
-                    </Link>
-                  ) : (
-                    <button className="btn btn-primary btn-lg" onClick={onSave} disabled={save.state === 'saving'} aria-busy={save.state === 'saving'}>
-                      <BookmarkPlus size={18} aria-hidden="true" />{' '}
-                      {save.state === 'saving'
-                        ? t({ en: 'Saving…', hi: 'सहेजा जा रहा है…' })
-                        : user
-                          ? t({ en: 'Save to my account', hi: 'मेरे खाते में सहेजें' })
-                          : t({ en: 'Sign in to save', hi: 'सहेजने के लिए साइन इन करें' })}
-                    </button>
-                  )}
-                  <button className="btn btn-ghost btn-lg" onClick={draw} disabled={shuffling}>
-                    ↻ {t({ en: 'Draw Again', hi: 'फिर से चुनें' })}
-                  </button>
-                </div>
-                {save.error && (
-                  <div style={{ marginTop: 16 }}>
-                    <ErrorState error={save.error} onRetry={onSave} compact />
-                  </div>
-                )}
+                <button className="btn btn-ghost btn-lg" onClick={draw}>
+                  ↻ {t({ en: 'Draw Again', hi: 'फिर से चुनें' })}
+                </button>
               </div>
             )}
           </>

@@ -2,21 +2,15 @@
 
 import Link from 'next/link';
 import { Clock, CircleCheck, ChevronRight, RotateCcw, Trophy } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
+import useProgress from '@/lib/jyotish/progress';
 import { hindiNum } from '@/lib/jyotish/num';
-import useLessonProgress from './useLessonProgress';
 import styles from './jyotish.module.css';
 
 export default function CourseMap({ lessons }) {
-  const { openSignIn } = useAuth();
-  const { done, stats, ready, synced, reset, error } = useLessonProgress();
+  const { done, ready, reset } = useProgress();
   const completed = lessons.filter((l) => done.includes(l.slug)).length;
   const percent = Math.round((completed / lessons.length) * 100);
   const nextLesson = lessons.find((l) => !done.includes(l.slug)) || lessons[0];
-
-  const confirmReset = () => {
-    if (window.confirm('क्या आप सारी प्रगति मिटाना चाहते हैं?')) reset();
-  };
 
   return (
     <section className={styles.map} aria-labelledby="course-path">
@@ -32,25 +26,6 @@ export default function CourseMap({ lessons }) {
                 : `आपने ${hindiNum(lessons.length)} में से ${hindiNum(completed)} पाठ पूर्ण किए हैं। अध्ययन जारी रखें!`
               : 'पहले पाठ से आरंभ करें और क्रम से आगे बढ़ें।'}
           </p>
-          {ready && (
-            <p className={styles.syncNote}>
-              {synced ? (
-                '☁️ आपकी प्रगति आपके खाते में सुरक्षित है — किसी भी डिवाइस पर जारी रखें।'
-              ) : (
-                <>
-                  <span>प्रगति अभी केवल इसी डिवाइस पर सहेजी जा रही है।</span>
-                  <button type="button" onClick={() => openSignIn()}>
-                    साइन इन करके सभी डिवाइस पर सहेजें
-                  </button>
-                </>
-              )}
-            </p>
-          )}
-          {error && (
-            <p className={styles.errorText} role="alert">
-              {error}
-            </p>
-          )}
         </div>
         <div className={styles.progressRight}>
           <div
@@ -73,7 +48,7 @@ export default function CourseMap({ lessons }) {
               </Link>
             )}
             {ready && completed > 0 && (
-              <button type="button" className={styles.reset} onClick={confirmReset} title="प्रगति मिटाएँ">
+              <button type="button" className={styles.reset} onClick={reset} title="प्रगति मिटाएँ">
                 <RotateCcw size={14} /> पुनः आरंभ
               </button>
             )}
@@ -84,7 +59,6 @@ export default function CourseMap({ lessons }) {
       <ol className={styles.path}>
         {lessons.map((l) => {
           const isDone = ready && done.includes(l.slug);
-          const stat = stats[l.slug];
           return (
             <li key={l.slug} className={styles.pathItem}>
               <span className={`${styles.pathDot} ${isDone ? styles.pathDotDone : ''}`} aria-hidden="true">
@@ -104,11 +78,6 @@ export default function CourseMap({ lessons }) {
                   <span className={styles.lessonMeta}>
                     <Clock size={14} aria-hidden="true" /> {hindiNum(l.minutes)} मिनट
                     {isDone && <span className={styles.doneTag}>✓ पूर्ण</span>}
-                    {stat?.attempts > 0 && stat.total > 0 && (
-                      <span className={styles.score} title={`${hindiNum(stat.attempts)} प्रयास`}>
-                        🏅 {hindiNum(stat.bestScore ?? 0)}/{hindiNum(stat.total)}
-                      </span>
-                    )}
                   </span>
                 </span>
                 <ChevronRight size={20} className={styles.lessonArrow} aria-hidden="true" />

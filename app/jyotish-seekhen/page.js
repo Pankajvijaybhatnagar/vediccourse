@@ -1,13 +1,9 @@
 import Link from 'next/link';
 import PageHeader from '@/components/PageHeader';
 import Reveal from '@/components/Reveal';
-import { apiGet } from '@/lib/server-api';
-import { hindiNum } from '@/lib/jyotish/num';
+import { LESSONS, LESSON_CARDS, TOTAL_MINUTES, hindiNum } from '@/lib/jyotish/lessons';
 import CourseMap from './CourseMap';
 import styles from './jyotish.module.css';
-
-// Lessons are edited in the backend; the cached page refreshes every 5 minutes.
-export const revalidate = 300;
 
 export const metadata = {
   title: 'ज्योतिष सीखें — मूल से गहराई तक, शुद्ध हिंदी में',
@@ -21,10 +17,8 @@ const STEPS = [
   { icon: '🪔', title: 'अभ्यास करें', text: 'अपनी मुफ़्त कुंडली बनाकर सीखे हुए नियम उस पर लागू करें — यही सच्चा अभ्यास है।' },
 ];
 
-export default async function JyotishSeekhenPage() {
-  const res = await apiGet('/jyotish/lessons?limit=100');
-  const lessons = res?.data ?? [];
-  const course = res?.meta?.course ?? { lessons: lessons.length, totalMinutes: 0, quizQuestions: 0 };
+export default function JyotishSeekhenPage() {
+  const quizCount = LESSONS.reduce((n, l) => n + l.quiz.length, 0);
 
   return (
     <>
@@ -40,9 +34,9 @@ export default async function JyotishSeekhenPage() {
         <div className="container">
           <div className={styles.stats}>
             {[
-              [hindiNum(course.lessons), 'विस्तृत पाठ'],
-              [`${hindiNum(Math.max(1, Math.round(course.totalMinutes / 60)))}+ घंटे`, 'अध्ययन सामग्री'],
-              [hindiNum(course.quizQuestions), 'अभ्यास प्रश्न'],
+              [hindiNum(LESSONS.length), 'विस्तृत पाठ'],
+              [`${hindiNum(Math.round(TOTAL_MINUTES / 60))}+ घंटे`, 'अध्ययन सामग्री'],
+              [hindiNum(quizCount), 'अभ्यास प्रश्न'],
               ['१००%', 'निःशुल्क'],
             ].map(([value, label]) => (
               <div key={label} className={styles.stat}>
@@ -73,13 +67,7 @@ export default async function JyotishSeekhenPage() {
             </ol>
           </Reveal>
 
-          {lessons.length ? (
-            <CourseMap lessons={lessons} />
-          ) : (
-            <p className={styles.empty} role="status">
-              पाठ्यक्रम शीघ्र उपलब्ध होगा। कृपया कुछ समय बाद पुनः देखें।
-            </p>
-          )}
+          <CourseMap lessons={LESSON_CARDS} />
 
           <Reveal className={styles.next}>
             <div>

@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Search, X, Sparkles, HandHelping, TriangleAlert, BookOpen } from 'lucide-react';
+import { SAMAGRI, SAMAGRI_CATEGORIES, getSamagri } from '@/lib/karmkand/samagri';
+import { POOJAS } from '@/lib/karmkand/poojas';
 import styles from '../karmkand.module.css';
 
-/** Samagri kosh. `items`, `categories` and `poojas` (cards with samagriItems) come from the API. */
-export default function SamagriKosh({ items = [], categories = [], poojas = [] }) {
-  const bySlug = useMemo(() => new Map(items.map((s) => [s.slug, s])), [items]);
+export default function SamagriKosh() {
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState('all');
   const [open, setOpen] = useState(null);
@@ -16,12 +16,12 @@ export default function SamagriKosh({ items = [], categories = [], poojas = [] }
   useEffect(() => {
     const fromHash = () => {
       const slug = decodeURIComponent(window.location.hash.slice(1));
-      if (bySlug.has(slug)) setOpen(slug);
+      if (getSamagri(slug)) setOpen(slug);
     };
     fromHash();
     window.addEventListener('hashchange', fromHash);
     return () => window.removeEventListener('hashchange', fromHash);
-  }, [bySlug]);
+  }, []);
 
   const close = useCallback(() => {
     setOpen(null);
@@ -42,16 +42,16 @@ export default function SamagriKosh({ items = [], categories = [], poojas = [] }
   const q = query.trim();
   const filtered = useMemo(
     () =>
-      items.filter(
+      SAMAGRI.filter(
         (s) =>
           (cat === 'all' || s.category === cat) &&
-          (!q || s.name?.includes(q) || s.alt?.includes(q) || s.significance?.includes(q) || s.slug.includes(q.toLowerCase()))
+          (!q || s.name.includes(q) || (s.alt && s.alt.includes(q)) || s.significance.includes(q))
       ),
-    [items, q, cat]
+    [q, cat]
   );
 
-  const item = open && bySlug.get(open);
-  const usedIn = item ? poojas.filter((p) => p.samagriItems?.includes(item.slug)) : [];
+  const item = open && getSamagri(open);
+  const usedIn = item ? POOJAS.filter((p) => p.samagri.some(([s]) => s === item.slug)) : [];
 
   return (
     <section className={styles.section}>
@@ -67,26 +67,22 @@ export default function SamagriKosh({ items = [], categories = [], poojas = [] }
         </div>
         <div className={styles.filterRow} role="group" aria-label="श्रेणी">
           <button className={styles.chip} aria-pressed={cat === 'all'} onClick={() => setCat('all')}>
-            सभी ({items.length})
+            सभी ({SAMAGRI.length})
           </button>
-          {categories.map((c) => (
-            <button key={c.key} className={styles.chip} aria-pressed={cat === c.key} onClick={() => setCat(c.key)}>
+          {SAMAGRI_CATEGORIES.map((c) => (
+            <button key={c.id} className={styles.chip} aria-pressed={cat === c.id} onClick={() => setCat(c.id)}>
               {c.icon} {c.name}
             </button>
           ))}
         </div>
 
-        {filtered.length === 0 && (
-          <div className={`card ${styles.empty}`} role="status">
-            {items.length === 0 ? 'अभी सामग्री कोश उपलब्ध नहीं है। कृपया कुछ समय बाद पुनः देखें।' : <>&quot;{q}&quot; से संबंधित कोई सामग्री नहीं मिली। कोई दूसरा शब्द आज़माएँ।</>}
-          </div>
-        )}
+        {filtered.length === 0 && <div className={`card ${styles.empty}`}>&quot;{q}&quot; से संबंधित कोई सामग्री नहीं मिली। कोई दूसरा शब्द आज़माएँ।</div>}
 
-        {categories.filter((c) => cat === 'all' || c.key === cat).map((c) => {
-          const list = filtered.filter((s) => s.category === c.key);
+        {SAMAGRI_CATEGORIES.filter((c) => cat === 'all' || c.id === cat).map((c) => {
+          const list = filtered.filter((s) => s.category === c.id);
           if (!list.length) return null;
           return (
-            <div key={c.key}>
+            <div key={c.id}>
               <div className={styles.catHead}>
                 <span aria-hidden="true">{c.icon}</span>
                 <div>
@@ -99,7 +95,7 @@ export default function SamagriKosh({ items = [], categories = [], poojas = [] }
                   <button key={s.slug} id={s.slug} className={styles.sCard} onClick={() => setOpen(s.slug)}>
                     <span className={styles.sTop}>
                       <span className={styles.sEmoji} aria-hidden="true">
-                        {s.image?.url ? <img src={s.image.url} alt="" width={44} height={44} loading="lazy" style={{ borderRadius: 12, objectFit: 'cover' }} /> : s.icon}
+                        {s.icon}
                       </span>
                       <span>
                         <h3>{s.name}</h3>
@@ -124,12 +120,12 @@ export default function SamagriKosh({ items = [], categories = [], poojas = [] }
             </button>
             <div className={styles.modalHead}>
               <span className={styles.sEmoji} aria-hidden="true">
-                {item.image?.url ? <img src={item.image.url} alt="" width={56} height={56} style={{ borderRadius: 14, objectFit: 'cover' }} /> : item.icon}
+                {item.icon}
               </span>
               <div>
                 <h2 id="samagri-title">{item.name}</h2>
                 <small>
-                  {categories.find((c) => c.key === item.category)?.name}
+                  {SAMAGRI_CATEGORIES.find((c) => c.id === item.category)?.name}
                   {item.alt && ` · अन्य नाम: ${item.alt}`}
                 </small>
               </div>
@@ -140,14 +136,12 @@ export default function SamagriKosh({ items = [], categories = [], poojas = [] }
               </h3>
               <p>{item.significance}</p>
             </div>
-            {item.usage && (
-              <div className={styles.modalSection}>
-                <h3>
-                  <HandHelping size={18} /> प्रयोग की विधि
-                </h3>
-                <p>{item.usage}</p>
-              </div>
-            )}
+            <div className={styles.modalSection}>
+              <h3>
+                <HandHelping size={18} /> प्रयोग की विधि
+              </h3>
+              <p>{item.usage}</p>
+            </div>
             {item.tip && (
               <div className={`${styles.modalSection} ${styles.tipBox}`}>
                 <h3>

@@ -1,28 +1,22 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Clock, Signal, ListOrdered } from 'lucide-react';
-import { getPooja } from '../../data';
+import { POOJAS, POOJA_CATEGORIES, getPooja } from '@/lib/karmkand/poojas';
+import { getSamagri } from '@/lib/karmkand/samagri';
 import SamagriChecklist from './SamagriChecklist';
 import PoojaSteps from './PoojaSteps';
 import MantraCard from './MantraCard';
 import styles from '../../karmkand.module.css';
 
-// Rendered on first request, then cached and revalidated (ISR), so builds don't depend on the API.
 export function generateStaticParams() {
-  return [];
+  return POOJAS.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const pooja = await getPooja(slug);
+  const pooja = getPooja(slug);
   if (!pooja) return {};
-  const image = pooja.coverImage?.url;
-  return {
-    title: `${pooja.name} — सम्पूर्ण विधि`,
-    description: pooja.short,
-    alternates: { canonical: `/karmkand/pooja-paddhati/${pooja.slug}` },
-    openGraph: { title: `${pooja.name} — सम्पूर्ण विधि`, description: pooja.short, type: 'article', ...(image && { images: [image] }) },
-  };
+  return { title: `${pooja.name} — सम्पूर्ण विधि`, description: pooja.short };
 }
 
 const TOC = [
@@ -38,12 +32,14 @@ const TOC = [
 
 export default async function PoojaDetail({ params }) {
   const { slug } = await params;
-  const pooja = await getPooja(slug);
+  const pooja = getPooja(slug);
   if (!pooja) notFound();
 
-  const { prev, next, categoryName: category } = pooja;
-  const items = (pooja.samagri ?? []).map((s) => ({ ...s, slug: s.item }));
-  const steps = pooja.steps ?? [];
+  const index = POOJAS.indexOf(pooja);
+  const prev = POOJAS[(index - 1 + POOJAS.length) % POOJAS.length];
+  const next = POOJAS[(index + 1) % POOJAS.length];
+  const items = pooja.samagri.map(([s, qty]) => ({ ...getSamagri(s), qty }));
+  const category = POOJA_CATEGORIES.find((c) => c.id === pooja.category)?.name;
 
   return (
     <section className={`${styles.section} page-top`} style={{ paddingTop: 'calc(var(--header-h) + 16px)' }}>
@@ -66,7 +62,7 @@ export default async function PoojaDetail({ params }) {
                 <Clock size={13} /> {pooja.duration}
               </span>
               <span>
-                <ListOrdered size={13} /> {steps.length} चरण
+                <ListOrdered size={13} /> {pooja.steps.length} चरण
               </span>
               {category && <span>{category}</span>}
             </div>
@@ -87,7 +83,7 @@ export default async function PoojaDetail({ params }) {
           <div className={styles.content}>
             <section id="parichay">
               <h2 className={styles.h2}>परिचय</h2>
-              {(pooja.intro ?? []).map((para) => (
+              {pooja.intro.map((para) => (
                 <p key={para.slice(0, 24)} className={styles.lead}>
                   {para}
                 </p>
@@ -120,7 +116,7 @@ export default async function PoojaDetail({ params }) {
             <section id="samagri">
               <h2 className={styles.h2}>पूजा सामग्री</h2>
               <SamagriChecklist slug={pooja.slug} items={items} />
-              {pooja.extraSamagri?.length > 0 && (
+              {pooja.extraSamagri && (
                 <div className={styles.extra}>
                   <strong>अन्य आवश्यक वस्तुएँ</strong>
                   <ul>
@@ -135,20 +131,20 @@ export default async function PoojaDetail({ params }) {
             <section id="taiyari">
               <h2 className={styles.h2}>पूजा से पहले की तैयारी</h2>
               <ul className={styles.prepList}>
-                {(pooja.preparation ?? []).map((x) => (
+                {pooja.preparation.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
             </section>
 
             <section id="vidhi">
-              <PoojaSteps name={pooja.name} steps={steps} />
+              <PoojaSteps name={pooja.name} steps={pooja.steps} />
             </section>
 
             <section id="mantra">
               <h2 className={styles.h2}>प्रमुख मंत्र एवं उनका अर्थ</h2>
               <div className={styles.mantras}>
-                {(pooja.mantras ?? []).map((m) => (
+                {pooja.mantras.map((m) => (
                   <MantraCard key={m.name} mantra={m} />
                 ))}
               </div>
@@ -160,7 +156,7 @@ export default async function PoojaDetail({ params }) {
                 <div className={`${styles.listCard} ${styles.rules}`}>
                   <h3>ध्यान रखने योग्य नियम</h3>
                   <ul>
-                    {(pooja.rules ?? []).map((r) => (
+                    {pooja.rules.map((r) => (
                       <li key={r}>{r}</li>
                     ))}
                   </ul>
@@ -168,7 +164,7 @@ export default async function PoojaDetail({ params }) {
                 <div className={`${styles.listCard} ${styles.benefits}`}>
                   <h3>पूजा के लाभ</h3>
                   <ul>
-                    {(pooja.benefits ?? []).map((b) => (
+                    {pooja.benefits.map((b) => (
                       <li key={b}>{b}</li>
                     ))}
                   </ul>
@@ -178,24 +174,22 @@ export default async function PoojaDetail({ params }) {
 
             <section id="prashn">
               <h2 className={styles.h2}>प्रश्नोत्तर</h2>
-              {(pooja.faq ?? []).map((f) => (
+              {pooja.faq.map((f) => (
                 <details key={f.q} className={styles.faqItem}>
                   <summary>{f.q}</summary>
                   <p>{f.a}</p>
                 </details>
               ))}
-              {prev && next && (
-                <div className={styles.pager}>
-                  <Link href={`/karmkand/pooja-paddhati/${prev.slug}`}>
-                    <small>← पिछली पूजा</small>
-                    <strong>{prev.name}</strong>
-                  </Link>
-                  <Link href={`/karmkand/pooja-paddhati/${next.slug}`}>
-                    <small>अगली पूजा →</small>
-                    <strong>{next.name}</strong>
-                  </Link>
-                </div>
-              )}
+              <div className={styles.pager}>
+                <Link href={`/karmkand/pooja-paddhati/${prev.slug}`}>
+                  <small>← पिछली पूजा</small>
+                  <strong>{prev.name}</strong>
+                </Link>
+                <Link href={`/karmkand/pooja-paddhati/${next.slug}`}>
+                  <small>अगली पूजा →</small>
+                  <strong>{next.name}</strong>
+                </Link>
+              </div>
             </section>
           </div>
         </div>

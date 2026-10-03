@@ -3,9 +3,7 @@
 import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
-import { todayKey } from '@/lib/useStoredState';
-import useJournal from './useJournal';
-import JournalSyncBar from './JournalSyncBar';
+import useStoredState from '@/lib/useStoredState';
 import styles from './tools.module.css';
 
 export const TRAPS = [
@@ -22,65 +20,22 @@ export const TRAPS = [
 ];
 
 const EMPTY = { situation: '', thought: '', emotion: '', before: 70, trap: '', evidenceFor: '', evidenceAgainst: '', balanced: '', after: 40 };
-const TRAP_IDS = new Set(TRAPS.map((tr) => tr.id));
-
-const pct = (v, def) => {
-  const n = Math.round(Number(v));
-  return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : def;
-};
-
-/** Form / local record → API payload (fields trimmed to the server's limits). */
-const toData = (r) => ({
-  situation: (r.situation || '').trim().slice(0, 2000) || '—',
-  thought: (r.thought || '').trim().slice(0, 2000),
-  emotion: (r.emotion || '').trim().slice(0, 200),
-  before: pct(r.before, 70),
-  trap: TRAP_IDS.has(r.trap) ? r.trap : '',
-  evidenceFor: (r.evidenceFor || '').trim().slice(0, 2000),
-  evidenceAgainst: (r.evidenceAgainst || '').trim().slice(0, 2000),
-  balanced: (r.balanced || '').trim().slice(0, 2000),
-  after: pct(r.after, 40),
-});
-
-const toEntries = (list) =>
-  (Array.isArray(list) ? list : [])
-    .filter((r) => r?.thought?.trim())
-    .map((r) => ({ date: String(r.date || '').slice(0, 10).match(/^\d{4}-\d{2}-\d{2}$/) ? String(r.date).slice(0, 10) : todayKey(), data: toData(r) }));
 
 export default function ThoughtRecord() {
   const { t, lang } = useLang();
-  const store = useJournal('thought', 'vedicdhaam-manobal-thoughts', [], toEntries);
-  const { synced } = store;
-  const entries = synced ? store.entries.map((e) => ({ ...e.data, id: e.id, date: e.date })) : store.local;
+  const [entries, setEntries] = useStoredState('vedicdhaam-manobal-thoughts', []);
   const [form, setForm] = useState(EMPTY);
   const [saved, setSaved] = useState(false);
-  const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.type === 'range' ? Number(e.target.value) : e.target.value }));
 
-  const canSave = Boolean(form.thought.trim());
-
-  const save = async (e) => {
+  const save = (e) => {
     e.preventDefault();
-    if (!canSave) return;
-    if (synced) {
-      setBusy(true);
-      try {
-        await store.save(todayKey(), toData(form));
-      } catch {
-        setBusy(false);
-        return;
-      }
-      setBusy(false);
-    } else {
-      store.setLocal((list) => [{ ...form, id: Date.now(), date: new Date().toISOString() }, ...list].slice(0, 50));
-    }
+    if (!form.thought.trim()) return;
+    setEntries((list) => [{ ...form, id: Date.now(), date: new Date().toISOString() }, ...list].slice(0, 50));
     setForm(EMPTY);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
-
-  const removeEntry = (id) => (synced ? store.remove(id) : store.setLocal((l) => l.filter((x) => x.id !== id)));
-  const entryDate = (d) => new Date(String(d || '').length === 10 ? `${d}T12:00` : d || Date.now());
 
   const field = (k, label, placeholder, rows = 2) => (
     <div className="field">
@@ -91,7 +46,6 @@ export default function ThoughtRecord() {
 
   return (
     <div className={styles.tool}>
-      <JournalSyncBar journal={store} />
       <form className={styles.formGrid} onSubmit={save}>
         {field('situation', { en: '1. Situation — what happened?', hi: '1. परिस्थिति — क्या हुआ?' }, { en: 'e.g. My friend did not reply to my message all day.', hi: 'जैसे: मित्र ने पूरे दिन मेरे संदेश का उत्तर नहीं दिया।' })}
         {field('thought', { en: '2. Automatic thought — what went through your mind?', hi: '2. स्वचालित विचार — मन में क्या आया?' }, { en: 'e.g. She is angry with me. Nobody likes me.', hi: 'जैसे: वह मुझसे नाराज़ है। मुझे कोई पसंद नहीं करता।' })}
@@ -130,28 +84,20 @@ export default function ThoughtRecord() {
           <input id="tr-after" type="range" min="0" max="100" step="5" value={form.after} onChange={set('after')} className={styles.range} />
         </div>
         <div className={styles.toolActions}>
-          <button className="btn btn-primary" disabled={!canSave || busy}>
+          <button className="btn btn-primary" disabled={!form.thought.trim()}>
             {t({ en: 'Save to my journal', hi: 'डायरी में सहेजें' })}
           </button>
-          {saved && (
-            <span className={styles.savedMsg}>
-              ✓ {synced ? t({ en: 'Saved to your account', hi: 'आपके खाते में सहेजा गया' }) : t({ en: 'Saved on this device', hi: 'इस उपकरण पर सहेजा गया' })}
-            </span>
-          )}
+          {saved && <span className={styles.savedMsg}>✓ {t({ en: 'Saved on this device', hi: 'इस उपकरण पर सहेजा गया' })}</span>}
         </div>
       </form>
 
       {entries.length > 0 && (
         <div className={styles.history}>
-          <h4>
-            {synced
-              ? t({ en: 'My recent entries (private, in my account)', hi: 'मेरी हाल की प्रविष्टियाँ (निजी, मेरे खाते में)' })
-              : t({ en: 'My recent entries (private, on this device)', hi: 'मेरी हाल की प्रविष्टियाँ (निजी, केवल इस उपकरण पर)' })}
-          </h4>
+          <h4>{t({ en: 'My recent entries (private, on this device)', hi: 'मेरी हाल की प्रविष्टियाँ (निजी, केवल इस उपकरण पर)' })}</h4>
           {entries.slice(0, 5).map((en) => (
             <div key={en.id} className={styles.entry}>
               <div>
-                <small>{entryDate(en.date).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short' })}</small>
+                <small>{new Date(en.date).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short' })}</small>
                 <p>
                   <s>{en.thought}</s>
                 </p>
@@ -160,7 +106,7 @@ export default function ThoughtRecord() {
                   {en.emotion} {en.before}% → {en.after}%
                 </small>
               </div>
-              <button className={styles.iconBtn} aria-label={t({ en: 'Delete entry', hi: 'प्रविष्टि हटाएँ' })} onClick={() => removeEntry(en.id)}>
+              <button className={styles.iconBtn} aria-label={t({ en: 'Delete entry', hi: 'प्रविष्टि हटाएँ' })} onClick={() => setEntries((l) => l.filter((x) => x.id !== en.id))}>
                 <Trash2 size={16} />
               </button>
             </div>

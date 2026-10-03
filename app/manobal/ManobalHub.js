@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Brain, Compass, Sun, Check, ClipboardCheck, MessageCircleHeart } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
+import { CHAPTER_CARDS } from '@/lib/manobal/chapters';
 import Reveal from '@/components/Reveal';
-import useChapterProgress from '@/components/manobal/useChapterProgress';
 import HelpBanner from '@/components/manobal/HelpBanner';
 import PracticeTool from '@/components/manobal/PracticeTool';
 import styles from './manobal.module.css';
@@ -47,13 +47,20 @@ const JOURNEY = [
   { week: p('Week 10+', 'सप्ताह 10+'), title: p('Live it', 'जीवन में उतारें'), text: p('Your personal plan keeps you steady through ups and downs.', 'आपकी व्यक्तिगत योजना हर उतार-चढ़ाव में आपको स्थिर रखती है।') },
 ];
 
-export default function ManobalHub({ chapters = [] }) {
+export default function ManobalHub() {
   const { t } = useLang();
-  const { done } = useChapterProgress();
+  const [done, setDone] = useState([]);
   const [tool, setTool] = useState('breathing');
 
-  const nextChapter = chapters.find((c) => !done.includes(c.slug)) || chapters[0];
-  const pct = chapters.length ? Math.round((done.filter((s) => chapters.some((c) => c.slug === s)).length / chapters.length) * 100) : 0;
+  useEffect(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem('vedicdhaam-manobal-progress') || '[]');
+      if (Array.isArray(v)) setDone(v);
+    } catch {}
+  }, []);
+
+  const nextChapter = CHAPTER_CARDS.find((c) => !done.includes(c.slug)) || CHAPTER_CARDS[0];
+  const pct = Math.round((done.filter((s) => CHAPTER_CARDS.some((c) => c.slug === s)).length / CHAPTER_CARDS.length) * 100);
 
   return (
     <div className={styles.page}>
@@ -81,7 +88,7 @@ export default function ManobalHub({ chapters = [] }) {
             </div>
             <div className={styles.heroStats}>
               <span>
-                <b>{chapters.length}</b> {t({ en: 'chapters', hi: 'अध्याय' })}
+                <b>12</b> {t({ en: 'chapters', hi: 'अध्याय' })}
               </span>
               <span>
                 <b>7</b> {t({ en: 'interactive tools', hi: 'संवादात्मक अभ्यास' })}
@@ -187,7 +194,7 @@ export default function ManobalHub({ chapters = [] }) {
           <div className={styles.chapHead}>
             <div>
               <span className="eyebrow">{t({ en: 'The course', hi: 'पाठ्यक्रम' })}</span>
-              <h2>{t({ en: `${chapters.length} chapters to a stronger mind`, hi: `दृढ़ मन की ओर ${chapters.length} अध्याय` })}</h2>
+              <h2>{t({ en: '12 chapters to a stronger mind', hi: 'दृढ़ मन की ओर 12 अध्याय' })}</h2>
             </div>
             <div className={styles.progress}>
               <span>
@@ -198,13 +205,8 @@ export default function ManobalHub({ chapters = [] }) {
               </div>
             </div>
           </div>
-          {chapters.length === 0 && (
-            <p className={styles.empty} role="status">
-              {t({ en: 'Chapters will be available shortly. Please check back soon.', hi: 'अध्याय शीघ्र उपलब्ध होंगे। कृपया कुछ समय बाद पुनः देखें।' })}
-            </p>
-          )}
           <div className={styles.chapters}>
-            {chapters.map((c, i) => {
+            {CHAPTER_CARDS.map((c, i) => {
               const isDone = done.includes(c.slug);
               return (
                 <Reveal key={c.slug} delay={(i % 4) * 70}>
@@ -231,7 +233,7 @@ export default function ManobalHub({ chapters = [] }) {
           <div className={styles.headCenter}>
             <span className="eyebrow">{t({ en: 'Mind toolkit', hi: 'मन के साधन' })}</span>
             <h2>{t({ en: 'Practise right here, right now', hi: 'यहीं, अभी अभ्यास करें' })}</h2>
-            <p>{t({ en: 'Everything you write stays private: on this device, or in your own account when you sign in. Only you can see it.', hi: 'आप जो भी लिखते हैं, वह निजी रहता है: इसी उपकरण पर, या साइन इन करने पर केवल आपके अपने खाते में। इसे केवल आप देख सकते हैं।' })}</p>
+            <p>{t({ en: 'Everything you write stays private on your own device.', hi: 'आप जो भी लिखते हैं, वह केवल आपके अपने उपकरण पर निजी रहता है।' })}</p>
           </div>
           <div className={styles.toolkit}>
             <div className={styles.toolTabs} role="tablist" aria-label={t({ en: 'Tools', hi: 'साधन' })}>

@@ -1,21 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Heart, Briefcase, Leaf } from 'lucide-react';
 import { SIGNS, getSign, ELEMENTS, localizeSign } from '@/lib/zodiac';
+import { getHoroscope } from '@/lib/horoscope';
 import { useLang } from '@/lib/i18n';
 import useToday from '@/lib/useToday';
-import useApiQuery, { localISODate } from '@/components/astro/useApiQuery';
-import { ErrorState, Skeleton } from '@/components/astro/States';
 import styles from './horoscope.module.css';
 
 const PERIODS = [
   { id: 'daily', label: { en: 'Today', hi: 'आज' } },
   { id: 'weekly', label: { en: 'This Week', hi: 'इस सप्ताह' } },
   { id: 'monthly', label: { en: 'This Month', hi: 'इस माह' } },
-  { id: 'yearly', label: { en: 'This Year', hi: 'इस वर्ष' } },
 ];
 
 export default function HoroscopeClient() {
@@ -28,25 +26,12 @@ export default function HoroscopeClient() {
   const sign = localizeSign(getSign(slug), lang);
   const locale = lang === 'hi' ? 'hi-IN' : 'en-IN';
 
-  // All 12 readings for the period in one request (a published staff override if present, otherwise generated),
-  // so switching signs is instant.
-  const { data: readings, loading, error, retry } = useApiQuery(today ? `/horoscopes?period=${period}&date=${localISODate(today)}` : null, {
-    keepPrevious: false,
-  });
-  const reading = readings?.find((r) => r.sign === slug) ?? null;
-  const matchSign = reading?.match ? getSign(reading.match.slug) : null;
-  const match = matchSign ? localizeSign(matchSign, lang) : null;
-
-  const syncUrl = (s, p) => router.replace(`/horoscope?sign=${s}${p !== 'daily' ? `&period=${p}` : ''}`, { scroll: false });
+  const reading = useMemo(() => (today ? getHoroscope(slug, period, today) : null), [slug, period, today]);
+  const match = reading ? localizeSign(reading.match, lang) : null;
 
   const chooseSign = (s) => {
     setSlug(s);
-    syncUrl(s, period);
-  };
-
-  const choosePeriod = (p) => {
-    setPeriod(p);
-    syncUrl(slug, p);
+    router.replace(`/horoscope?sign=${s}${period !== 'daily' ? `&period=${period}` : ''}`, { scroll: false });
   };
 
   const periodLabel = () => {
@@ -54,7 +39,6 @@ export default function HoroscopeClient() {
     const f = (d, o) => d.toLocaleDateString(locale, o);
     if (period === 'daily') return f(today, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     if (period === 'monthly') return f(today, { month: 'long', year: 'numeric' });
-    if (period === 'yearly') return f(today, { year: 'numeric' });
     const start = new Date(today);
     start.setDate(today.getDate() - today.getDay());
     const end = new Date(start);
@@ -88,7 +72,7 @@ export default function HoroscopeClient() {
         <div className={styles.tabsRow}>
           <div className="tabs" role="tablist" aria-label={t({ en: 'Forecast period', hi: 'अवधि' })}>
             {PERIODS.map((p) => (
-              <button key={p.id} role="tab" aria-selected={period === p.id} className="tab" onClick={() => choosePeriod(p.id)}>
+              <button key={p.id} role="tab" aria-selected={period === p.id} className="tab" onClick={() => setPeriod(p.id)}>
                 {t(p.label)}
               </button>
             ))}
@@ -110,15 +94,7 @@ export default function HoroscopeClient() {
               </div>
             </header>
 
-            {error ? (
-              <ErrorState error={error} onRetry={retry} />
-            ) : reading ? (
-              <p className={`${styles.lead} fade-up`}>{t(reading.text)}</p>
-            ) : (
-              <div aria-busy={loading} aria-label={t({ en: 'Consulting the stars…', hi: 'सितारों से परामर्श हो रहा है…' })}>
-                <Skeleton lines={3} />
-              </div>
-            )}
+            <p className={`${styles.lead} fade-up`}>{reading ? t(reading.text) : t({ en: 'Consulting the stars…', hi: 'सितारों से परामर्श हो रहा है…' })}</p>
 
             <div className={styles.areas}>
               {areas.map((a, i) => (

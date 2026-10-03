@@ -350,16 +350,3 @@
     min-width: 0;
   }
 }
-
-/* ---------- Custom place (State → District → Village picker) ---------- */
-.placeCard {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
-  padding: 18px 20px;
-  margin: -8px 0 24px;
-}
-
-.status {
-  margin-bottom: 24px;
-}

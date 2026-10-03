@@ -1,31 +1,29 @@
 import { notFound } from 'next/navigation';
-import { apiGet } from '@/lib/server-api';
+import { CHAPTERS, CHAPTER_CARDS, getChapter } from '@/lib/manobal/chapters';
 import ChapterView from './ChapterView';
 
-export const revalidate = 300;
-
-// Chapters render on first visit and are then cached (ISR), so builds don't depend on the API.
-export async function generateStaticParams() {
-  return [];
+export function generateStaticParams() {
+  return CHAPTERS.map((c) => ({ slug: c.slug }));
 }
-
-const getChapter = (slug) => apiGet(`/manobal/chapters/${encodeURIComponent(slug)}`).then((res) => res?.data ?? null);
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const ch = await getChapter(slug);
+  const ch = getChapter(slug);
   if (!ch) return {};
   return {
-    title: `${ch.title?.hi ?? ''} · ${ch.title?.en ?? ''} — मनोबल`,
-    description: [ch.subtitle?.hi, ch.subtitle?.en].filter(Boolean).join(' | '),
+    title: `${ch.title.hi} · ${ch.title.en} — मनोबल`,
+    description: `${ch.subtitle.hi} | ${ch.subtitle.en}`,
   };
 }
 
 export default async function ChapterPage({ params }) {
   const { slug } = await params;
-  const chapter = await getChapter(slug);
+  const chapter = getChapter(slug);
   if (!chapter) notFound();
 
-  const { prev = null, next = null, total, ...rest } = chapter;
-  return <ChapterView chapter={rest} prev={prev} next={next} total={total} />;
+  const i = CHAPTER_CARDS.findIndex((c) => c.slug === slug);
+  const prev = i > 0 ? CHAPTER_CARDS[i - 1] : null;
+  const next = i < CHAPTER_CARDS.length - 1 ? CHAPTER_CARDS[i + 1] : null;
+
+  return <ChapterView chapter={chapter} prev={prev} next={next} total={CHAPTER_CARDS.length} />;
 }

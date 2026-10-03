@@ -1,110 +1,50 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Compass, Sparkles, RotateCcw } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
-import { api } from '@/lib/api';
+import { RIASEC, QUESTIONS, SCALE, GRAHA_CAREERS, SIGN_LORD, LORD_IN_HOUSE } from '@/lib/manobal/career';
+import { buildKundli, GRAHAS } from '@/lib/kundli';
+import { CITIES } from '@/lib/panchang';
 import { SIGNS, localizeSign } from '@/lib/zodiac';
-import BirthPlacePicker from '@/components/BirthPlacePicker';
 import styles from './tools.module.css';
 
-// Questions rarely change; share one request across every compass on the page.
-let questionsPromise = null;
-const loadQuestions = () => {
-  questionsPromise ??= api('/manobal/career/questions', { auth: false })
-    .then((res) => res.data)
-    .catch((err) => {
-      questionsPromise = null;
-      throw err;
-    });
-  return questionsPromise;
-};
-
-/**
- * Career compass: interest profile (RIASEC) optionally blended with the 10th house of the birth chart.
- * Questions from GET /manobal/career/questions; scoring by POST /manobal/career/compass (nothing stored).
- */
-export default function CareerCompass({ initialData = null }) {
+export default function CareerCompass() {
   const { t, lang } = useLang();
-  const [data, setData] = useState(initialData); // { riasec, questions, scale }
-  const [loadError, setLoadError] = useState(false);
   const [answers, setAnswers] = useState({});
-  const [birth, setBirth] = useState({ date: '', time: '' });
-  const [place, setPlace] = useState(null); // { lat, lon, tz, name } from BirthPlacePicker
+  const [birth, setBirth] = useState({ date: '', time: '', city: 'delhi' });
   const [result, setResult] = useState(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
   const resultRef = useRef(null);
 
-  const load = () => {
-    setLoadError(false);
-    loadQuestions()
-      .then(setData)
-      .catch(() => setLoadError(true));
-  };
-
-  useEffect(() => {
-    if (!data) load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const questions = data?.questions ?? [];
-  const scale = data?.scale ?? [];
-  const riasec = data?.riasec ?? {};
   const answered = Object.keys(answers).length;
-  const complete = questions.length > 0 && answered === questions.length;
-  const placeMissing = Boolean(birth.date) && !place;
+  const complete = answered === QUESTIONS.length;
 
-  const compute = async () => {
-    setBusy(true);
-    setError('');
-    try {
-      const body = { answers: questions.map((_, i) => answers[i]) };
-      if (birth.date && place) {
-        body.birth = { date: birth.date, ...(birth.time && { time: birth.time }), lat: place.lat, lon: place.lon, tz: place.tz };
-      }
-      const res = await api('/manobal/career/compass', { method: 'POST', body, auth: false });
-      setResult(res.data);
-      requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-    } catch (err) {
-      setError(
-        err?.status === 429
-          ? t({ en: 'Too many requests — please wait a minute and try again.', hi: 'बहुत अधिक अनुरोध — कृपया एक मिनट बाद पुनः प्रयास करें।' })
-          : t({ en: 'We could not calculate your compass right now. Please try again.', hi: 'इस समय करियर कम्पास की गणना नहीं हो सकी। कृपया पुनः प्रयास करें।' })
-      );
-    } finally {
-      setBusy(false);
+  const compute = () => {
+    const scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+    QUESTIONS.forEach((q, i) => (scores[q.type] += answers[i] ?? 0));
+    const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+    let astro = null;
+    if (birth.date) {
+      const city = CITIES.find((c) => c.id === birth.city);
+      const k = buildKundli({ date: birth.date, time: birth.time || '12:00', lat: city.lat, lon: city.lon, tz: city.tz });
+      const lagnaIdx = SIGNS.indexOf(k.lagna.sign);
+      const tenthIdx = (lagnaIdx + 9) % 12;
+      const lordKey = SIGN_LORD[tenthIdx];
+      const lord = k.planets.find((pl) => pl.key === lordKey);
+      const inTenth = k.planets.filter((pl) => pl.house === 10);
+      astro = { tenthSign: SIGNS[tenthIdx], lord, inTenth, timeKnown: !!birth.time };
+      // Planets tied to the 10th house nudge the matching interest types.
+      [lordKey, ...inTenth.map((pl) => pl.key)].forEach((key) => GRAHA_CAREERS[key].riasec.forEach((r, i) => (scores[r] += i === 0 ? 1.5 : 0.75)));
     }
+    const blended = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    setResult({ ranked, blended, astro, max: 9 });
+    requestAnimationFrame(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   };
 
+  const grahaName = (key) => t(GRAHAS.find((g) => g.key === key).name);
   const topCodes = useMemo(() => result?.blended.slice(0, 3).map(([c]) => c) || [], [result]);
-  const signName = (slug) => {
-    const sign = SIGNS.find((s) => s.slug === slug);
-    return sign ? localizeSign(sign, lang).name : slug;
-  };
-  const today = new Date().toISOString().slice(0, 10);
-
-  if (!data) {
-    return (
-      <div className={styles.tool}>
-        {loadError ? (
-          <div className={styles.toolActions} role="alert">
-            <p className={styles.toolNote} style={{ margin: 0 }}>
-              {t({ en: 'Could not load the career compass.', hi: 'करियर कम्पास लोड नहीं हो सका।' })}
-            </p>
-            <button type="button" className="btn btn-primary btn-sm" onClick={load}>
-              {t({ en: 'Try again', hi: 'पुनः प्रयास करें' })}
-            </button>
-          </div>
-        ) : (
-          <p className={styles.toolNote} aria-busy="true">
-            {t({ en: 'Loading…', hi: 'लोड हो रहा है…' })}
-          </p>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className={styles.tool}>
@@ -115,18 +55,18 @@ export default function CareerCompass({ initialData = null }) {
               <Compass size={18} /> {t({ en: 'Part 1 — Your interests', hi: 'भाग 1 — आपकी रुचियाँ' })}
             </span>
             <span className={styles.rounds}>
-              {answered}/{questions.length}
+              {answered}/{QUESTIONS.length}
             </span>
           </div>
           <div className={styles.progressBar} aria-hidden="true">
-            <span style={{ width: `${(answered / questions.length) * 100}%` }} />
+            <span style={{ width: `${(answered / QUESTIONS.length) * 100}%` }} />
           </div>
           <ol className={styles.quizList}>
-            {questions.map((q, i) => (
+            {QUESTIONS.map((q, i) => (
               <li key={i}>
                 <p>{t(q.text)}</p>
                 <div className={styles.scale} role="radiogroup" aria-label={t(q.text)}>
-                  {scale.map((s) => (
+                  {SCALE.map((s) => (
                     <button key={s.v} role="radio" aria-checked={answers[i] === s.v} onClick={() => setAnswers((a) => ({ ...a, [i]: s.v }))}>
                       {t(s.label)}
                     </button>
@@ -150,37 +90,31 @@ export default function CareerCompass({ initialData = null }) {
           <div className={styles.row3}>
             <div className="field">
               <label htmlFor="cc-date">{t({ en: 'Date of birth', hi: 'जन्म तिथि' })}</label>
-              <input id="cc-date" type="date" className="input" max={today} value={birth.date} onChange={(e) => setBirth((b) => ({ ...b, date: e.target.value }))} />
+              <input id="cc-date" type="date" className="input" value={birth.date} onChange={(e) => setBirth((b) => ({ ...b, date: e.target.value }))} />
             </div>
             <div className="field">
               <label htmlFor="cc-time">{t({ en: 'Time of birth', hi: 'जन्म समय' })}</label>
               <input id="cc-time" type="time" className="input" value={birth.time} onChange={(e) => setBirth((b) => ({ ...b, time: e.target.value }))} />
             </div>
-          </div>
-          {birth.date && (
-            <div className={styles.placeField}>
-              <span className={styles.placeLabel}>{t({ en: 'Place of birth', hi: 'जन्म स्थान' })}</span>
-              <BirthPlacePicker onChange={setPlace} error={placeMissing} />
+            <div className="field">
+              <label htmlFor="cc-city">{t({ en: 'Place of birth', hi: 'जन्म स्थान' })}</label>
+              <select id="cc-city" className="input" value={birth.city} onChange={(e) => setBirth((b) => ({ ...b, city: e.target.value }))}>
+                {CITIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {t(c.name)}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
+          </div>
 
-          {error && (
-            <p className={styles.errorText} role="alert">
-              {error}
-            </p>
-          )}
           <div className={styles.toolActions}>
-            <button className="btn btn-primary btn-lg" onClick={compute} disabled={!complete || placeMissing || busy}>
-              <Compass size={18} /> {busy ? t({ en: 'Calculating…', hi: 'गणना हो रही है…' }) : t({ en: 'Show my career compass', hi: 'मेरा करियर कम्पास दिखाएँ' })}
+            <button className="btn btn-primary btn-lg" onClick={compute} disabled={!complete}>
+              <Compass size={18} /> {t({ en: 'Show my career compass', hi: 'मेरा करियर कम्पास दिखाएँ' })}
             </button>
             {!complete && (
               <span className={styles.toolNote} style={{ margin: 0 }}>
-                {t({ en: `Answer all ${questions.length} statements to continue.`, hi: `आगे बढ़ने के लिए सभी ${questions.length} कथनों का उत्तर दें।` })}
-              </span>
-            )}
-            {complete && placeMissing && (
-              <span className={styles.toolNote} style={{ margin: 0 }}>
-                {t({ en: 'Choose your place of birth, or clear the date to skip Part 2.', hi: 'जन्म स्थान चुनें, या भाग 2 छोड़ने के लिए तिथि हटा दें।' })}
+                {t({ en: `Answer all ${QUESTIONS.length} statements to continue.`, hi: `आगे बढ़ने के लिए सभी ${QUESTIONS.length} कथनों का उत्तर दें।` })}
               </span>
             )}
           </div>
@@ -200,7 +134,7 @@ export default function CareerCompass({ initialData = null }) {
             {result.ranked.map(([code, score]) => (
               <div key={code} className={`${styles.riasecRow} ${topCodes.includes(code) ? styles.riasecTop : ''}`}>
                 <span>
-                  {riasec[code]?.icon} {t(riasec[code]?.name)}
+                  {RIASEC[code].icon} {t(RIASEC[code].name)}
                 </span>
                 <div className="meter">
                   <span style={{ width: `${(score / result.max) * 100}%` }} />
@@ -215,19 +149,19 @@ export default function CareerCompass({ initialData = null }) {
               <h4>🪐 {t({ en: 'What your 10th house (Karma Bhava) says', hi: 'आपका दशम भाव (कर्म भाव) क्या कहता है' })}</h4>
               <ul>
                 <li>
-                  {t({ en: '10th house sign', hi: 'दशम भाव की राशि' })}: <b>{signName(result.astro.tenthSign)}</b> · {t({ en: 'lord', hi: 'स्वामी' })}:{' '}
-                  <b>{t(result.astro.lord.name)}</b>
+                  {t({ en: '10th house sign', hi: 'दशम भाव की राशि' })}: <b>{localizeSign(result.astro.tenthSign, lang).name}</b> · {t({ en: 'lord', hi: 'स्वामी' })}:{' '}
+                  <b>{grahaName(result.astro.lord.key)}</b>
                 </li>
                 <li>
-                  {t({ en: `${t(result.astro.lord.name)} sits in house ${result.astro.lord.house}`, hi: `${t(result.astro.lord.name)} ${result.astro.lord.house}वें भाव में स्थित है` })} — {t(result.astro.lord.meaning)}
+                  {t({ en: `${grahaName(result.astro.lord.key)} sits in house ${result.astro.lord.house}`, hi: `${grahaName(result.astro.lord.key)} ${result.astro.lord.house}वें भाव में स्थित है` })} — {t(LORD_IN_HOUSE[result.astro.lord.house])}
                 </li>
                 <li>
-                  {t({ en: 'Fields linked to this lord', hi: 'इस स्वामी से जुड़े क्षेत्र' })}: {t(result.astro.lord.fields)}
+                  {t({ en: 'Fields linked to this lord', hi: 'इस स्वामी से जुड़े क्षेत्र' })}: {t(GRAHA_CAREERS[result.astro.lord.key].fields)}
                 </li>
                 {result.astro.inTenth.length > 0 ? (
                   result.astro.inTenth.map((pl) => (
                     <li key={pl.key}>
-                      <b>{t(pl.name)}</b> {t({ en: 'in the 10th house', hi: 'दशम भाव में' })}: {t(pl.fields)}
+                      <b>{grahaName(pl.key)}</b> {t({ en: 'in the 10th house', hi: 'दशम भाव में' })}: {t(GRAHA_CAREERS[pl.key].fields)}
                     </li>
                   ))
                 ) : (
@@ -245,11 +179,11 @@ export default function CareerCompass({ initialData = null }) {
             {topCodes.map((code) => (
               <div key={code} className={styles.fitCard}>
                 <strong>
-                  {riasec[code]?.icon} {t(riasec[code]?.name)}
+                  {RIASEC[code].icon} {t(RIASEC[code].name)}
                 </strong>
-                <p>{t(riasec[code]?.desc)}</p>
+                <p>{t(RIASEC[code].desc)}</p>
                 <div className={styles.tags}>
-                  {(riasec[code]?.careers?.[lang] ?? riasec[code]?.careers?.en ?? []).map((c) => (
+                  {RIASEC[code].careers[lang].map((c) => (
                     <span key={c}>{c}</span>
                   ))}
                 </div>

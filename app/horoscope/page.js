@@ -4,7 +4,7 @@ import HoroscopeClient from './HoroscopeClient';
 
 export const metadata = {
   title: 'Horoscope · राशिफल',
-  description: 'Free daily, weekly, monthly and yearly horoscope (rashifal) for all 12 zodiac signs in Hindi and English.',
+  description: 'Free daily, weekly and monthly horoscope (rashifal) for all 12 zodiac signs in Hindi and English.',
 };
 
 export default function HoroscopePage() {

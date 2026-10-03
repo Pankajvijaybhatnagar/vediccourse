@@ -2,18 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useLang } from '@/lib/i18n';
-import { todayKey } from '@/lib/useStoredState';
-import useJournal from './useJournal';
-import JournalSyncBar from './JournalSyncBar';
+import useStoredState, { todayKey } from '@/lib/useStoredState';
 import styles from './tools.module.css';
-
-const cleanItems = (arr) => (Array.isArray(arr) ? arr : []).slice(0, 3).map((x) => String(x ?? '').trim().slice(0, 300));
-
-/** Local { 'YYYY-MM-DD': [3 strings] } → API entries (empty days skipped). */
-const toEntries = (journal) =>
-  Object.entries(journal || {})
-    .filter(([date, arr]) => /^\d{4}-\d{2}-\d{2}$/.test(date) && cleanItems(arr).some(Boolean))
-    .map(([date, arr]) => ({ date, data: { items: cleanItems(arr) } }));
 
 const PROMPTS = [
   { en: 'Something small that made me smile today…', hi: 'आज किस छोटी-सी बात ने मुझे मुस्कुराया…' },
@@ -23,38 +13,16 @@ const PROMPTS = [
 
 export default function GratitudeJournal() {
   const { t, lang } = useLang();
-  const store = useJournal('gratitude', 'vedicdhaam-manobal-gratitude', {}, toEntries);
-  const { synced } = store;
-  const journal = synced ? Object.fromEntries(store.entries.map((e) => [e.date, e.data.items])) : store.local;
-  const loaded = store.ready;
+  const [journal, setJournal, loaded] = useStoredState('vedicdhaam-manobal-gratitude', {});
   const today = todayKey();
   const [items, setItems] = useState(['', '', '']);
-  const [savedMsg, setSavedMsg] = useState(false);
 
-  // Load today's saved items once the store is ready (and again when switching device-only ↔ account).
   useEffect(() => {
-    if (loaded) {
-      const saved = journal[today];
-      setItems(saved ? [0, 1, 2].map((i) => saved[i] ?? '') : ['', '', '']);
-    }
+    if (loaded && journal[today]) setItems(journal[today]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, synced]);
+  }, [loaded]);
 
-  const save = async () => {
-    if (!synced) {
-      store.setLocal((j) => ({ ...j, [today]: items }));
-      return;
-    }
-    const clean = cleanItems(items);
-    if (!clean.some(Boolean)) return;
-    const prev = journal[today] ? cleanItems(journal[today]) : null;
-    if (prev && prev.join('\u0000') === clean.join('\u0000')) return; // unchanged; skip the request
-    try {
-      await store.save(today, { items: clean });
-      setSavedMsg(true);
-      setTimeout(() => setSavedMsg(false), 2500);
-    } catch {}
-  };
+  const save = () => setJournal((j) => ({ ...j, [today]: items }));
 
   // Consecutive days with at least one entry, ending today or yesterday.
   const streak = (() => {
@@ -77,7 +45,6 @@ export default function GratitudeJournal() {
 
   return (
     <div className={styles.tool}>
-      <JournalSyncBar journal={store} />
       <div className={styles.streak}>
         🪔 {t({ en: `${streak}-day gratitude streak`, hi: `${streak} दिन से लगातार कृतज्ञता` })}
       </div>
@@ -89,7 +56,6 @@ export default function GratitudeJournal() {
           <input
             id={`gr-${i}`}
             className="input"
-            maxLength={300}
             value={items[i]}
             onChange={(e) => setItems((arr) => arr.map((x, j) => (j === i ? e.target.value : x)))}
             onBlur={save}
@@ -100,7 +66,6 @@ export default function GratitudeJournal() {
         <button className="btn btn-primary" onClick={save} disabled={!items.some((x) => x.trim())}>
           {t({ en: 'Save today’s gratitude', hi: 'आज की कृतज्ञता सहेजें' })}
         </button>
-        {savedMsg && <span className={styles.savedMsg}>✓ {t({ en: 'Saved to your account', hi: 'आपके खाते में सहेजा गया' })}</span>}
       </div>
       {past.length > 0 && (
         <div className={styles.history}>

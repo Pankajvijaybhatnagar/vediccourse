@@ -4,13 +4,21 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Clock, Users, Lightbulb, MessageSquareQuote, Sparkles, PenLine, ChevronLeft, ChevronRight, CircleCheck, ListChecks } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
-import { useAuth } from '@/lib/auth';
 import PracticeTool from '@/components/manobal/PracticeTool';
 import HelpBanner from '@/components/manobal/HelpBanner';
-import useChapterProgress from '@/components/manobal/useChapterProgress';
 import styles from './chapter.module.css';
 
+const PROGRESS_KEY = 'vedicdhaam-manobal-progress';
 const hiDigits = (n) => String(n).replace(/\d/g, (d) => '०१२३४५६७८९'[d]);
+
+function readProgress() {
+  try {
+    const v = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
 
 function Reflection({ slug, questions }) {
   const { t } = useLang();
@@ -63,22 +71,27 @@ function Reflection({ slug, questions }) {
 
 export default function ChapterView({ chapter, prev, next, total }) {
   const { t, lang } = useLang();
-  const { openSignIn } = useAuth();
-  const progress = useChapterProgress();
-  const done = progress.ready && progress.done.includes(chapter.slug);
+  const [done, setDone] = useState(false);
   const num = (n) => (lang === 'hi' ? hiDigits(n) : n);
 
-  const toggleDone = () => progress.setComplete(chapter.slug, !done);
+  useEffect(() => {
+    setDone(readProgress().includes(chapter.slug));
+  }, [chapter.slug]);
 
-  const sections = chapter.sections ?? [];
-  const reflect = chapter.reflect ?? [];
-  const summary = chapter.summary ?? [];
+  const toggleDone = () => {
+    const list = readProgress();
+    const nextList = done ? list.filter((s) => s !== chapter.slug) : [...new Set([...list, chapter.slug])];
+    try {
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(nextList));
+    } catch {}
+    setDone(!done);
+  };
 
   const toc = [
-    ...sections.map((s, i) => ({ id: `sec-${i + 1}`, label: s.heading })),
+    ...chapter.sections.map((s, i) => ({ id: `sec-${i + 1}`, label: s.heading })),
     chapter.astro && { id: 'astro', label: { en: 'Astrological view', hi: 'ज्योतिष दृष्टि' } },
     chapter.practice && { id: 'practice', label: { en: 'Practice', hi: 'अभ्यास' } },
-    reflect.length > 0 && { id: 'reflect', label: { en: 'Reflect', hi: 'चिंतन' } },
+    { id: 'reflect', label: { en: 'Reflect', hi: 'चिंतन' } },
     { id: 'summary', label: { en: 'Summary', hi: 'सारांश' } },
   ].filter(Boolean);
 
@@ -142,7 +155,7 @@ export default function ChapterView({ chapter, prev, next, total }) {
           <div className={styles.content}>
             <p className={styles.intro}>{t(chapter.intro)}</p>
 
-            {sections.map((s, i) => (
+            {chapter.sections.map((s, i) => (
               <section key={i} id={`sec-${i + 1}`} className={styles.section}>
                 <h2 className={styles.h2}>
                   <span className={styles.secNum}>{num(i + 1)}</span>
@@ -205,7 +218,7 @@ export default function ChapterView({ chapter, prev, next, total }) {
                   <Sparkles size={15} /> {t({ en: 'Astrological view', hi: 'ज्योतिष दृष्टि' })}
                 </span>
                 <h2 className={styles.astroTitle}>{t(chapter.astro.heading)}</h2>
-                {(chapter.astro.paragraphs ?? []).map((p, j) => (
+                {chapter.astro.paragraphs.map((p, j) => (
                   <p key={j}>{t(p)}</p>
                 ))}
                 {chapter.astro.mantra && (
@@ -222,7 +235,7 @@ export default function ChapterView({ chapter, prev, next, total }) {
                 <span className={styles.practiceTag}>{t({ en: 'Practice — train your neurons', hi: 'अभ्यास — न्यूरॉन का प्रशिक्षण' })}</span>
                 <h2 className={styles.practiceTitle}>{t(chapter.practice.title)}</h2>
                 <ol className={styles.steps}>
-                  {(chapter.practice.steps ?? []).map((st, j) => (
+                  {chapter.practice.steps.map((st, j) => (
                     <li key={j}>
                       <span>{num(j + 1)}</span>
                       {t(st)}
@@ -237,45 +250,24 @@ export default function ChapterView({ chapter, prev, next, total }) {
               </section>
             )}
 
-            {reflect.length > 0 && (
-              <section id="reflect" className={styles.section}>
-                <h2 className={styles.h2}>
-                  <PenLine size={22} className={styles.h2Icon} /> {t({ en: 'Reflect & write', hi: 'चिंतन करें और लिखें' })}
-                </h2>
-                <Reflection slug={chapter.slug} questions={reflect} />
-              </section>
-            )}
+            <section id="reflect" className={styles.section}>
+              <h2 className={styles.h2}>
+                <PenLine size={22} className={styles.h2Icon} /> {t({ en: 'Reflect & write', hi: 'चिंतन करें और लिखें' })}
+              </h2>
+              <Reflection slug={chapter.slug} questions={chapter.reflect} />
+            </section>
 
             <section id="summary" className={`${styles.section} ${styles.summary}`}>
               <h2 className={styles.summaryTitle}>{t({ en: 'Key takeaways', hi: 'सारांश — मुख्य बातें' })}</h2>
               <ul>
-                {summary.map((s, j) => (
+                {chapter.summary.map((s, j) => (
                   <li key={j}>{t(s)}</li>
                 ))}
               </ul>
-              <button className={`btn ${done ? 'btn-ghost' : 'btn-primary'} btn-lg`} onClick={toggleDone} aria-pressed={done} disabled={!progress.ready}>
+              <button className={`btn ${done ? 'btn-ghost' : 'btn-primary'} btn-lg`} onClick={toggleDone} aria-pressed={done}>
                 <CircleCheck size={18} />
                 {done ? t({ en: 'Completed — mark as not done', hi: 'पूर्ण — अपूर्ण चिह्नित करें' }) : t({ en: 'Mark chapter complete', hi: 'अध्याय पूर्ण करें' })}
               </button>
-              {progress.ready && (
-                <p className={styles.syncNote}>
-                  {progress.synced ? (
-                    t({ en: '☁️ Progress is saved to your account.', hi: '☁️ प्रगति आपके खाते में सहेजी जाती है।' })
-                  ) : (
-                    <>
-                      {t({ en: 'Progress is saved on this device only.', hi: 'प्रगति केवल इसी उपकरण पर सहेजी जा रही है।' })}{' '}
-                      <button type="button" onClick={() => openSignIn()}>
-                        {t({ en: 'Sign in to keep it on every device', hi: 'साइन इन करें — हर उपकरण पर सुरक्षित रहे' })}
-                      </button>
-                    </>
-                  )}
-                </p>
-              )}
-              {progress.error && (
-                <p className={styles.errorText} role="alert">
-                  {progress.error}
-                </p>
-              )}
             </section>
 
             <nav className={styles.pager} aria-label={t({ en: 'Chapter navigation', hi: 'अध्याय नेविगेशन' })}>

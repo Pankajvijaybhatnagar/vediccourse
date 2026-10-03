@@ -1,24 +1,18 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { BookOpen, ChevronLeft, ChevronRight, Clock, Lightbulb, ListChecks } from 'lucide-react';
-import { apiGet } from '@/lib/server-api';
-import { hindiNum } from '@/lib/jyotish/num';
+import { LESSONS, getLesson, hindiNum } from '@/lib/jyotish/lessons';
 import Quiz from './Quiz';
 import CompleteButton from './CompleteButton';
 import styles from './lesson.module.css';
 
-export const revalidate = 300;
-
-// Lessons render on first visit and are then cached (ISR), so builds don't depend on the API.
-export async function generateStaticParams() {
-  return [];
+export function generateStaticParams() {
+  return LESSONS.map((l) => ({ slug: l.slug }));
 }
-
-const getLesson = (slug) => apiGet(`/jyotish/lessons/${encodeURIComponent(slug)}`).then((res) => res?.data ?? null);
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const lesson = await getLesson(slug);
+  const lesson = getLesson(slug);
   if (!lesson) return {};
   return {
     title: `पाठ ${hindiNum(lesson.number)}: ${lesson.title} — ज्योतिष सीखें`,
@@ -28,14 +22,12 @@ export async function generateMetadata({ params }) {
 
 export default async function LessonPage({ params }) {
   const { slug } = await params;
-  const [lesson, list] = await Promise.all([getLesson(slug), apiGet('/jyotish/lessons?limit=1')]);
+  const lesson = getLesson(slug);
   if (!lesson) notFound();
 
-  const totalLessons = list?.meta?.course?.lessons ?? list?.meta?.total ?? lesson.number;
-  const { prev, next } = lesson;
-  const sections = lesson.sections ?? [];
-  const summary = lesson.summary ?? [];
-  const quiz = lesson.quiz ?? [];
+  const index = LESSONS.indexOf(lesson);
+  const prev = LESSONS[index - 1];
+  const next = LESSONS[index + 1];
 
   return (
     <article className={styles.page}>
@@ -56,7 +48,7 @@ export default async function LessonPage({ params }) {
               <div>
                 <div className={styles.meta}>
                   <span className={styles.lessonNo}>
-                    पाठ {hindiNum(lesson.number)} / {hindiNum(totalLessons)}
+                    पाठ {hindiNum(lesson.number)} / {hindiNum(LESSONS.length)}
                   </span>
                   <span className={`${styles.level} ${lesson.level === 'मध्यम' ? styles.levelMid : ''}`}>{lesson.level}</span>
                   <span className={styles.time}>
@@ -81,21 +73,17 @@ export default async function LessonPage({ params }) {
               <li>
                 <a href="#parichay">परिचय</a>
               </li>
-              {sections.map((s, i) => (
+              {lesson.sections.map((s, i) => (
                 <li key={s.heading}>
                   <a href={`#khand-${i + 1}`}>{s.heading}</a>
                 </li>
               ))}
-              {summary.length > 0 && (
-                <li>
-                  <a href="#saransh">सारांश</a>
-                </li>
-              )}
-              {quiz.length > 0 && (
-                <li>
-                  <a href="#prashnottari">प्रश्नोत्तरी</a>
-                </li>
-              )}
+              <li>
+                <a href="#saransh">सारांश</a>
+              </li>
+              <li>
+                <a href="#prashnottari">प्रश्नोत्तरी</a>
+              </li>
             </ol>
           </details>
         </aside>
@@ -105,7 +93,7 @@ export default async function LessonPage({ params }) {
             {lesson.intro}
           </p>
 
-          {sections.map((s, i) => (
+          {lesson.sections.map((s, i) => (
             <section key={s.heading} id={`khand-${i + 1}`} className={styles.block}>
               <h2 className={styles.h2}>
                 <span className={styles.h2Num}>{hindiNum(i + 1)}</span>
@@ -156,29 +144,25 @@ export default async function LessonPage({ params }) {
             </section>
           ))}
 
-          {summary.length > 0 && (
-            <section id="saransh" className={styles.summary}>
-              <h2 className={styles.h2}>
-                <ListChecks size={22} aria-hidden="true" className={styles.summaryIcon} />
-                सारांश — मुख्य बिंदु
-              </h2>
-              <ul>
-                {summary.map((pt) => (
-                  <li key={pt}>{pt}</li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <section id="saransh" className={styles.summary}>
+            <h2 className={styles.h2}>
+              <ListChecks size={22} aria-hidden="true" className={styles.summaryIcon} />
+              सारांश — मुख्य बिंदु
+            </h2>
+            <ul>
+              {lesson.summary.map((pt) => (
+                <li key={pt}>{pt}</li>
+              ))}
+            </ul>
+          </section>
 
-          {quiz.length > 0 && (
-            <section id="prashnottari" className={styles.block}>
-              <h2 className={styles.h2}>
-                <span className={styles.h2Num}>?</span>
-                प्रश्नोत्तरी — अपना ज्ञान परखें
-              </h2>
-              <Quiz slug={lesson.slug} questions={quiz} />
-            </section>
-          )}
+          <section id="prashnottari" className={styles.block}>
+            <h2 className={styles.h2}>
+              <span className={styles.h2Num}>?</span>
+              प्रश्नोत्तरी — अपना ज्ञान परखें
+            </h2>
+            <Quiz questions={lesson.quiz} />
+          </section>
 
           <CompleteButton slug={lesson.slug} nextSlug={next?.slug} />
 
