@@ -3,13 +3,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-  ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ExternalLink, Languages, MessageCircle, PhoneCall,
-  Play, Plus, Star, Briefcase, Minus,
+  ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ExternalLink, MessageCircle, PhoneCall,
+  Play, Plus, Star, Minus,
 } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
 import useToday from '@/lib/useToday';
 import { SIGNS, localizeSign } from '@/lib/zodiac';
-import { ASTROLOGERS, LIVE_SESSIONS, SKILLS, LANGS, getAstrologer, initials } from '@/lib/astrologers';
+import { ASTROLOGERS, LIVE_SESSIONS, SKILLS, getAstrologer, initials, expertNo } from '@/lib/astrologers';
 import {
   HERO_SLIDES, QUICK_ACTIONS, APPOINTMENTS, READINGS, CONSULT_TOPICS, BLOGS, VIDEOS, NEWS, STATS,
   TESTIMONIALS, FAQS,
@@ -137,41 +137,28 @@ function Hero() {
 /* ------------------------------------------------------------------------ */
 export function AstrologerCard({ astro }) {
   const { t } = useLang();
-  const [following, setFollowing] = useState(false);
   return (
     <article className={styles.astro}>
       <div className={styles.astroTop}>
         <div className={styles.astroLeft}>
-          <Avatar astro={astro} online={astro.online} />
-          <span className={styles.rating}>
-            <Star size={11} fill="currentColor" /> {astro.rating} | {astro.orders.toLocaleString('en-IN')}
-          </span>
+          <Avatar astro={astro} size={72} />
+          <span className={styles.rating}>{expertNo(astro)}</span>
         </div>
         <div className={styles.astroInfo}>
           <div className={styles.astroNameRow}>
             <h3 title={t(astro.name)}>
               {t(astro.name)} <BadgeCheck size={16} className={styles.verified} />
             </h3>
-            <button className={`${styles.follow} ${following ? styles.following : ''}`} onClick={() => setFollowing((f) => !f)} aria-pressed={following}>
-              {following ? t({ en: '✓ Following', hi: '✓ फ़ॉलो किया' }) : t({ en: '+ Follow', hi: '+ फ़ॉलो' })}
-            </button>
           </div>
-          <p>
-            <Languages size={14} /> {astro.langs.map((l) => t(LANGS[l])).join(', ')}
+          <p className={styles.astroTitle}>
+            <Star size={14} /> {t(astro.title)}
           </p>
-          <p>
-            <Briefcase size={14} /> {astro.exp} {t({ en: 'Years', hi: 'वर्ष' })}
-          </p>
-          <p className={styles.skills}>
-            <Star size={14} /> {astro.skills.map((s) => t(SKILLS[s])).join(', ')}
-          </p>
+          <p className={styles.astroBio}>{t(astro.bio)}</p>
         </div>
       </div>
       <div className={styles.astroBottom}>
         <div className={styles.price}>
-          <strong>₹{astro.price}/{t({ en: 'Min', hi: 'मिनट' })}</strong>
-          {astro.oldPrice && <s>₹{astro.oldPrice}/{t({ en: 'Min', hi: 'मिनट' })}</s>}
-          {astro.oldPrice && <span className={styles.deal}>{t({ en: `FLAT DEAL ${astro.price}`, hi: `फ्लैट डील ${astro.price}` })}</span>}
+          <span>{astro.skills.map((s) => t(SKILLS[s])).join(' · ')}</span>
         </div>
         <div className={styles.astroBtns}>
           <Link href={`/contact?astro=${astro.id}&mode=chat`} className={styles.greenBtn}>
@@ -318,7 +305,7 @@ function Faq() {
 export default function HomeClient() {
   const { t, lang } = useLang();
   const today = useToday();
-  const topAstros = ASTROLOGERS.filter((a) => a.online).slice(0, 3);
+  const topAstros = ASTROLOGERS.slice(0, 3);
 
   return (
     <div className={styles.home}>
@@ -338,9 +325,9 @@ export default function HomeClient() {
           ))}
         </div>
 
-        {/* Top online astrologers */}
+        {/* Panel of experts */}
         <section className={styles.block}>
-          <RowHead title={{ en: 'Top Online Astrologers', hi: 'शीर्ष ऑनलाइन ज्योतिषी' }} href="/astrologers" />
+          <RowHead title={{ en: 'Our Panel of Experts', hi: 'हमारे विशेषज्ञ मंडल' }} href="/astrologers" />
           <div className={`rail ${styles.astroGrid}`}>
             {topAstros.map((a) => (
               <AstrologerCard key={a.id} astro={a} />

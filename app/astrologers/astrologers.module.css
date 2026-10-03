@@ -2,6 +2,13 @@
   padding-bottom: 20px;
 }
 
+.intro {
+  margin: 0 0 18px;
+  padding: 18px 20px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
 .topics {
   display: flex;
   gap: 10px;
@@ -44,7 +51,7 @@
 
 .filters {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr;
   gap: 12px;
   align-items: center;
   padding: 16px;
@@ -145,12 +152,6 @@
 @media (max-width: 1100px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .filters {
-    grid-template-columns: 1fr 1fr;
-  }
-  .search {
-    grid-column: 1 / -1;
   }
 }
 

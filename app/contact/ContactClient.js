@@ -126,7 +126,7 @@ export default function ContactClient() {
                       <option value="any">{t({ en: 'Any available astrologer (fastest)', hi: 'कोई भी उपलब्ध ज्योतिषी (सबसे जल्दी)' })}</option>
                       {ASTROLOGERS.map((a) => (
                         <option key={a.id} value={a.id}>
-                          {t(a.name)} · {a.exp} {t({ en: 'yrs', hi: 'वर्ष' })}
+                          {t(a.name)} · {t(a.title)}
                         </option>
                       ))}
                     </select>
