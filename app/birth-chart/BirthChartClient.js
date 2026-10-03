@@ -1,12 +1,14 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import { SIGNS, localizeSign } from '@/lib/zodiac';
 import { buildKundli, GRAHAS } from '@/lib/kundli';
 import { CITIES } from '@/lib/panchang';
 import { lifePath, mulank, MEANINGS } from '@/lib/numerology';
 import { useLang } from '@/lib/i18n';
+import BirthPlacePicker from '@/components/BirthPlacePicker';
+import Phaladesh from './Phaladesh';
 import styles from './birthchart.module.css';
 
 // House label anchors for the North Indian diamond chart (400×400).
@@ -58,11 +60,19 @@ function NorthIndianChart({ kundli }) {
   );
 }
 
+// Places outside India (Indian places come from the State → District → Village picker).
+const ABROAD = CITIES.filter((c) => c.tz !== 5.5);
+
 const fmtDeg = (d) => `${Math.floor(d)}° ${String(Math.floor((d % 1) * 60)).padStart(2, '0')}′`;
 
 export default function BirthChartClient() {
   const { t, lang } = useLang();
-  const [form, setForm] = useState({ name: '', date: '', time: '06:00', city: 'delhi', lat: '', lon: '', tz: '5.5' });
+  const [form, setForm] = useState({ name: '', date: '', time: '06:00', country: 'india', city: ABROAD[0].id, lat: '', lon: '', tz: '5.5' });
+  const [indiaPlace, setIndiaPlace] = useState(null);
+  const onIndiaPlace = useCallback((p) => {
+    setIndiaPlace(p);
+    if (p) setErrors((er) => ({ ...er, place: undefined }));
+  }, []);
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -82,7 +92,10 @@ export default function BirthChartClient() {
     else if (new Date(form.date) > new Date()) next.date = { en: 'Birth date cannot be in the future.', hi: 'जन्म तिथि भविष्य की नहीं हो सकती।' };
     else if (+form.date.slice(0, 4) < 1900 || +form.date.slice(0, 4) > 2050) next.date = { en: 'Please enter a year between 1900 and 2050.', hi: 'कृपया 1900 से 2050 के बीच का वर्ष दर्ज करें।' };
     let place;
-    if (form.city === 'other') {
+    if (form.country === 'india') {
+      place = indiaPlace;
+      if (!place) next.place = { en: 'Please select your birth state and district.', hi: 'कृपया जन्म का राज्य और ज़िला चुनें।' };
+    } else if (form.city === 'other') {
       const lat = parseFloat(form.lat);
       const lon = parseFloat(form.lon);
       if (!(Math.abs(lat) <= 66)) next.lat = { en: 'Latitude must be between -66 and 66.', hi: 'अक्षांश -66 से 66 के बीच हो।' };
@@ -128,17 +141,28 @@ export default function BirthChartClient() {
               <input id="bc-time" type="time" className="input" value={form.time} onChange={update('time')} />
             </div>
             <div className={`field ${styles.full}`}>
-              <label htmlFor="bc-city">{t({ en: 'Place of birth', hi: 'जन्म स्थान' })}</label>
-              <select id="bc-city" className="input" value={form.city} onChange={update('city')}>
-                {CITIES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {t(c.name)}
-                  </option>
-                ))}
-                <option value="other">{t({ en: 'Other (enter coordinates)', hi: 'अन्य (निर्देशांक दर्ज करें)' })}</option>
+              <label htmlFor="bc-country">{t({ en: 'Place of birth (Janam Sthan)', hi: 'जन्म स्थान' })}</label>
+              <select id="bc-country" className="input" value={form.country} onChange={update('country')}>
+                <option value="india">{t({ en: 'India', hi: 'भारत' })}</option>
+                <option value="abroad">{t({ en: 'Outside India', hi: 'भारत के बाहर' })}</option>
               </select>
             </div>
-            {form.city === 'other' && (
+            {form.country === 'india' ? (
+              <BirthPlacePicker onChange={onIndiaPlace} error={errors.place} />
+            ) : (
+              <div className={`field ${styles.full}`}>
+                <label htmlFor="bc-city">{t({ en: 'City', hi: 'शहर' })}</label>
+                <select id="bc-city" className="input" value={form.city} onChange={update('city')}>
+                  {ABROAD.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {t(c.name)}
+                    </option>
+                  ))}
+                  <option value="other">{t({ en: 'Other (enter coordinates)', hi: 'अन्य (निर्देशांक दर्ज करें)' })}</option>
+                </select>
+              </div>
+            )}
+            {form.country === 'abroad' && form.city === 'other' && (
               <>
                 <div className="field">
                   <label htmlFor="bc-lat">{t({ en: 'Latitude (N +)', hi: 'अक्षांश (उत्तर +)' })}</label>
@@ -304,6 +328,8 @@ export default function BirthChartClient() {
                 <p className={styles.small}>{t(MEANINGS[lifePath(result.date)].title)}</p>
               </div>
             </div>
+
+            <Phaladesh kundli={k} />
 
             <div className={`${styles.cta} fade-up`}>
               <div>
