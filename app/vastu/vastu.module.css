@@ -24,11 +24,11 @@
 .stars .on { fill: currentColor; }
 .stars .off { color: #e6dcc6; }
 
-.s5 { --tone: #1e9e5a; --tone-soft: #e5f6ec; }
-.s4 { --tone: #5aa52a; --tone-soft: #eef7e4; }
-.s3 { --tone: #d99a00; --tone-soft: #fff5d9; }
-.s2 { --tone: #e8701a; --tone-soft: #fdeede; }
-.s1 { --tone: #d23a2f; --tone-soft: #fde6e3; }
+.s5 { --heat: #bfe6cd; --tone: #1e9e5a; --tone-soft: #e5f6ec; }
+.s4 { --heat: #d6ecbf; --tone: #5aa52a; --tone-soft: #eef7e4; }
+.s3 { --heat: #ffe6a1; --tone: #d99a00; --tone-soft: #fff5d9; }
+.s2 { --heat: #fdd2ae; --tone: #e8701a; --tone-soft: #fdeede; }
+.s1 { --heat: #f8bfb8; --tone: #d23a2f; --tone-soft: #fde6e3; }
 .stars.s5, .stars.s4, .stars.s3, .stars.s2, .stars.s1 { color: var(--tone); }
 
 .t5 { color: #1e9e5a; }
@@ -324,11 +324,6 @@
   font-size: clamp(1.3rem, 2.6vw, 1.75rem);
   margin: 0 0 4px;
 }
-.qSub {
-  margin: 0;
-  font-size: 0.92rem;
-  color: var(--text-dim);
-}
 .hint {
   display: inline-block;
   margin: 10px 0 0;
@@ -339,9 +334,17 @@
   color: var(--maroon);
 }
 
+.qGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 24px;
+  align-items: start;
+}
+
 .options {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  align-content: start;
   gap: 12px;
 }
 
@@ -394,6 +397,137 @@
   box-shadow: 0 0 0 3px rgba(255, 194, 26, 0.35);
 }
 .selected .letter { background: var(--saffron-deep); color: #fff; }
+.previewing { border-color: var(--saffron); background: #fffcf3; }
+
+/* ---------- direction chart ---------- */
+.chartBox {
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+  padding: 16px 16px 12px;
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 40%, #fffdf6, #fff4d9);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.chartTitle {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--saffron-deep);
+  margin-bottom: 4px;
+}
+
+.compass, .wall {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.ring { fill: #fff; stroke: var(--gold-soft); stroke-width: 1.5; }
+.ringInner { fill: none; stroke: #f0d48a; stroke-width: 1; }
+
+.sec path, .sec circle, .sec rect {
+  fill: #fffaf0;
+  stroke: #efd9a4;
+  stroke-width: 1.2;
+  transition: fill 0.3s, stroke 0.3s;
+}
+.sec.heat path, .sec.heat circle, .sec.heat rect { fill: var(--heat); }
+.sec.strong path, .sec.strong circle, .sec.strong rect {
+  fill: var(--tone);
+  stroke: #fff;
+  stroke-width: 2;
+  animation: secPulse 1.6s ease-in-out infinite;
+}
+.sec.focusCell path { fill: var(--saffron-2); stroke: var(--saffron-deep); stroke-width: 2; animation: secPulse 1.6s ease-in-out infinite; }
+.sec.high path { fill: #a63a2a; stroke: #fff; stroke-width: 2; }
+.sec.low path { fill: #8cc4ef; stroke: #fff; stroke-width: 2; }
+.sec.doorCell path { fill: var(--saffron); stroke: var(--maroon); stroke-width: 2; }
+@keyframes secPulse { 50% { opacity: 0.78; } }
+
+.secText {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  fill: var(--text);
+  pointer-events: none;
+}
+.strong .secText, .high .secText { fill: #fff; }
+.centreText {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  fill: var(--saffron-deep);
+}
+.strong .centreText { fill: #fff; }
+
+.labelHi { font-size: 13.5px; font-weight: 800; text-anchor: middle; fill: var(--maroon); }
+.labelEn { font-size: 9.5px; font-weight: 700; text-anchor: middle; fill: var(--text-dim); letter-spacing: 0.05em; }
+.labelSub { font-size: 9px; font-weight: 700; text-anchor: middle; fill: var(--text-dim); }
+.labelHot .labelHi, .labelSub.labelHot { fill: var(--saffron-deep); }
+.northArrow { fill: var(--vermilion); }
+.sun circle { fill: #ffb703; }
+.sun line { stroke: #ffb703; stroke-width: 2; stroke-linecap: round; }
+
+.sideWall { stroke: var(--gold); stroke-width: 6; stroke-linecap: round; fill: none; }
+.doorSwing { fill: none; stroke: var(--maroon); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.wallCaption { font-size: 11px; font-weight: 700; text-anchor: middle; fill: var(--text-muted); }
+.wallSide { font-size: 11px; font-weight: 700; text-anchor: middle; fill: var(--maroon); }
+.person circle, .person path:not(.lookArrow) { fill: var(--saffron-deep); }
+.lookArrow { fill: none; stroke: var(--saffron-deep); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 4 3; }
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 8px 0 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+.caption.s5, .caption.s4, .caption.s3, .caption.s2, .caption.s1 { border-color: var(--tone); background: var(--tone-soft); }
+.caption strong { color: var(--text); }
+.caption em { font-style: normal; font-weight: 700; color: var(--tone); }
+
+.heatLegend {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0 4px;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.heatLegend li { display: flex; align-items: center; gap: 5px; }
+.heatLegend span { width: 12px; height: 12px; border-radius: 3px; background: var(--heat); border: 1px solid var(--tone); }
+
+.howTo {
+  margin-top: 8px;
+  text-align: left;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.howTo summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--saffron-deep);
+  text-align: center;
+}
+.howTo ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
 
 .navRow {
   display: flex;
@@ -685,6 +819,9 @@
 }
 
 @media (max-width: 860px) {
+  .qGrid { grid-template-columns: 1fr; }
+  .chartBox { position: static; order: -1; }
+  .compass, .wall { max-width: 270px; }
   .intro, .resultGrid { grid-template-columns: 1fr; }
   .introSide { order: -1; }
   .defects { grid-template-columns: 1fr; }

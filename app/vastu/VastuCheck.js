@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AppWindow, ArrowRight, Baby, Bath, BedDouble, ChefHat, ChevronLeft, ChevronRight, CircleCheck, CloudRain, Compass,
@@ -10,6 +10,7 @@ import {
 import { useLang } from '@/lib/i18n';
 import useStoredState from '@/lib/useStoredState';
 import { QUESTIONS, SECTIONS, STAR_LEGEND, ZONES, scoreAnswers } from '@/lib/vastu';
+import DirectionChart from './DirectionChart';
 import styles from './vastu.module.css';
 
 const ICONS = {
@@ -138,16 +139,53 @@ function Intro({ answered, onStart, onReset }) {
   );
 }
 
+/* ---------- Options + direction chart (hover state resets per question via key) ---------- */
+function OptionsWithChart({ q, chosen, answers, onPick }) {
+  const { t } = useLang();
+  const [hover, setHover] = useState(null);
+  const active = hover ?? chosen ?? null;
+
+  return (
+    <div className={styles.qGrid}>
+      <div className={styles.options} role="radiogroup" aria-label={t(q.q)} onMouseLeave={() => setHover(null)}>
+        {q.options.map((opt, i) => {
+          const selected = chosen === i;
+          return (
+            <button
+              key={i}
+              role="radio"
+              aria-checked={selected}
+              className={`${styles.option} ${selected ? styles.selected : ''} ${active === i && !selected ? styles.previewing : ''}`}
+              onClick={() => onPick(q.id, i)}
+              onMouseEnter={() => setHover(i)}
+              onFocus={() => setHover(i)}
+              onBlur={() => setHover(null)}
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
+              <span className={styles.letter}>{selected ? <CircleCheck size={18} /> : LETTERS[i]}</span>
+              <span className={styles.optText}>
+                <span>{t(opt)}</span>
+                {opt.stars != null && <small className={styles[`t${opt.stars}`]}>{t(starLabel(opt.stars))}</small>}
+              </span>
+              {opt.stars != null && <Stars n={opt.stars} size={14} />}
+            </button>
+          );
+        })}
+      </div>
+      <DirectionChart q={q} active={active} answers={answers} />
+    </div>
+  );
+}
+
 /* ---------- One question ---------- */
 function Question({ index, answers, onPick, onNav, onFinish }) {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   const q = QUESTIONS[index];
   const Ico = ICONS[q.icon] || Compass;
   const section = SECTIONS.find((s) => s.key === q.section);
   const chosen = answers[q.id];
   const answered = Object.keys(answers).length;
   const isLast = index === TOTAL - 1;
-  const other = lang === 'hi' ? 'en' : 'hi';
 
   return (
     <div className={styles.quiz}>
@@ -195,33 +233,11 @@ function Question({ index, answers, onPick, onNav, onFinish }) {
             </span>
             <div>
               <h2 className={styles.qTitle}>{t(q.q)}</h2>
-              <p className={styles.qSub}>{q.q[other]}</p>
               {q.hint && <p className={styles.hint}>{t(q.hint)}</p>}
             </div>
           </div>
 
-          <div className={styles.options} role="radiogroup" aria-label={t(q.q)}>
-            {q.options.map((opt, i) => {
-              const selected = chosen === i;
-              return (
-                <button
-                  key={i}
-                  role="radio"
-                  aria-checked={selected}
-                  className={`${styles.option} ${selected ? styles.selected : ''}`}
-                  onClick={() => onPick(q.id, i)}
-                  style={{ animationDelay: `${i * 40}ms` }}
-                >
-                  <span className={styles.letter}>{selected ? <CircleCheck size={18} /> : LETTERS[i]}</span>
-                  <span className={styles.optText}>
-                    <span>{t(opt)}</span>
-                    {opt.stars != null && <small className={styles[`t${opt.stars}`]}>{t(starLabel(opt.stars))}</small>}
-                  </span>
-                  {opt.stars != null && <Stars n={opt.stars} size={14} />}
-                </button>
-              );
-            })}
-          </div>
+          <OptionsWithChart key={q.id} q={q} chosen={chosen} answers={answers} onPick={onPick} />
         </div>
 
         <div className={styles.navRow}>
@@ -462,7 +478,7 @@ export default function VastuCheck() {
     setAnswers((a) => ({ ...a, [id]: i }));
     const idx = QUESTIONS.findIndex((q) => q.id === id);
     clearTimeout(timer.current);
-    if (idx < TOTAL - 1) timer.current = setTimeout(() => go(idx + 1), 420);
+    if (idx < TOTAL - 1) timer.current = setTimeout(() => go(idx + 1), 900);
   };
 
   const reset = () => {
