@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Sunrise, Sunset, MapPin } from 'lucide-react
 import { getPanchang, fmtMinutes, CITIES } from '@/lib/panchang';
 import { localizeSign } from '@/lib/zodiac';
 import { useLang } from '@/lib/i18n';
+import DailyRashifal from './DailyRashifal';
 import styles from './panchang.module.css';
 
 const toIso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -51,6 +52,9 @@ export default function PanchangClient() {
               <ChevronRight size={20} />
             </button>
           </div>
+          <a href="#rashifal" className={styles.rashiJump}>
+            ✦ {t({ en: "Today's Rashifal", hi: 'आज का राशिफल' })} ↓
+          </a>
           <div className={styles.cityPick}>
             <MapPin size={18} />
             <label className="sr-only" htmlFor="pc-city">
@@ -189,6 +193,8 @@ export default function PanchangClient() {
                 </div>
               ))}
             </div>
+
+            <DailyRashifal data={data} date={date} />
 
             <p className={styles.note}>
               {t({

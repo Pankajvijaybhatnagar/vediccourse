@@ -3,7 +3,7 @@ import PanchangClient from './PanchangClient';
 
 export const metadata = {
   title: "Today's Panchang · आज का पंचांग",
-  description: 'Daily Hindu Panchang: Tithi, Nakshatra, Yoga, Karana, sunrise, sunset, Rahu Kaal, Abhijit Muhurat and Choghadiya for Indian cities.',
+  description: 'Daily Hindu Panchang: Tithi, Nakshatra, Yoga, Karana, sunrise, sunset, Rahu Kaal, Abhijit Muhurat, Choghadiya and the daily rashifal for all 12 rashis in Hindi and English.',
 };
 
 export default function PanchangPage() {
@@ -15,8 +15,8 @@ export default function PanchangPage() {
         highlight={{ en: 'Panchang', hi: 'पंचांग' }}
         crumb={{ en: 'Panchang', hi: 'पंचांग' }}
         lead={{
-          en: 'Tithi, Nakshatra, Yoga, Karana and Vaar along with sunrise, Rahu Kaal, Abhijit Muhurat and Choghadiya for your city.',
-          hi: 'आपके शहर के लिए तिथि, नक्षत्र, योग, करण और वार के साथ सूर्योदय, राहु काल, अभिजित मुहूर्त और चौघड़िया।',
+          en: 'Tithi, Nakshatra, Yoga, Karana and Vaar along with sunrise, Rahu Kaal, Abhijit Muhurat, Choghadiya and the daily rashifal for all 12 signs.',
+          hi: 'आपके शहर के लिए तिथि, नक्षत्र, योग, करण और वार के साथ सूर्योदय, राहु काल, अभिजित मुहूर्त, चौघड़िया और सभी 12 राशियों का आज का राशिफल।',
         }}
       />
       <PanchangClient />
