@@ -362,3 +362,9 @@
     min-width: 0;
   }
 }
+
+.jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

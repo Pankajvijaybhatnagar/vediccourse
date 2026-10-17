@@ -20,6 +20,8 @@ import HeroArt from './HeroArt';
 import SeoContent from './SeoContent';
 import ManobalSection from './ManobalSection';
 import KarmkandSection from './KarmkandSection';
+import TodayUpayCard from '@/components/upay/TodayUpayCard';
+import useCity from '@/lib/useCity';
 import styles from './home.module.css';
 
 const fmtDate = (date, lang, opts = { day: 'numeric', month: 'short', year: 'numeric' }) =>
@@ -305,6 +307,8 @@ function Faq() {
 export default function HomeClient() {
   const { t, lang } = useLang();
   const today = useToday();
+  const { city } = useCity();
+  const todayIso = today ? `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}` : '';
   const topAstros = ASTROLOGERS.slice(0, 3);
 
   return (
@@ -324,6 +328,9 @@ export default function HomeClient() {
             </Link>
           ))}
         </div>
+
+        {/* Aaj ka Upay — changes daily with the panchang */}
+        <TodayUpayCard date={todayIso} city={city} />
 
         {/* Panel of experts */}
         <section className={styles.block}>

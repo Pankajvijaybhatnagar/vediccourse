@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight, Sunrise, Sunset, MapPin } from 'lucide-react
 import { getPanchang, fmtMinutes, CITIES } from '@/lib/panchang';
 import { localizeSign } from '@/lib/zodiac';
 import { useLang } from '@/lib/i18n';
+import useCity from '@/lib/useCity';
+import TodayUpayCard from '@/components/upay/TodayUpayCard';
 import DailyRashifal from './DailyRashifal';
 import styles from './panchang.module.css';
 
@@ -13,9 +15,8 @@ const toIso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, 
 export default function PanchangClient() {
   const { t, lang } = useLang();
   const [date, setDate] = useState('');
-  const [cityId, setCityId] = useState('delhi');
+  const { cityId, city, setCityId } = useCity();
   const [nowMins, setNowMins] = useState(null);
-  const city = CITIES.find((c) => c.id === cityId);
   const locale = lang === 'hi' ? 'hi-IN' : 'en-IN';
 
   // Resolve "today" in the browser to avoid a server/client date mismatch.
@@ -52,9 +53,14 @@ export default function PanchangClient() {
               <ChevronRight size={20} />
             </button>
           </div>
-          <a href="#rashifal" className={styles.rashiJump}>
-            ✦ {t({ en: "Today's Rashifal", hi: 'आज का राशिफल' })} ↓
-          </a>
+          <span className={styles.jumps}>
+            <a href="#upay" className={styles.rashiJump}>
+              🪔 {t({ en: "Today's Upay", hi: 'आज का उपाय' })} ↓
+            </a>
+            <a href="#rashifal" className={styles.rashiJump}>
+              ✦ {t({ en: "Today's Rashifal", hi: 'आज का राशिफल' })} ↓
+            </a>
+          </span>
           <div className={styles.cityPick}>
             <MapPin size={18} />
             <label className="sr-only" htmlFor="pc-city">
@@ -193,6 +199,8 @@ export default function PanchangClient() {
                 </div>
               ))}
             </div>
+
+            <TodayUpayCard date={date} city={city} />
 
             <DailyRashifal data={data} date={date} />
 
