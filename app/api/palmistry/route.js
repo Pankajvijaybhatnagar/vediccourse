@@ -1,7 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import Anthropic from '@anthropic-ai/sdk';
-import { GoogleGenAI, ApiError as GeminiApiError, ThinkingLevel } from '@google/genai';
 
 // Palm reading needs the Node runtime (SDK + larger request bodies).
 export const runtime = 'nodejs';
@@ -10,35 +9,14 @@ export const maxDuration = 120;
 const MAX_BYTES = 5 * 1024 * 1024; // Claude's per-image limit (base64-decoded)
 const TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-// Which AI reads the palm: Gemini when GEMINI_API_KEY is set, otherwise Claude (ANTHROPIC_API_KEY).
-// Clients are created on first use so a key added to the environment is picked up after a restart.
-// Tried in order; the next one is used when a model is overloaded, timed out or unavailable to this key.
-// gemini-3.5-flash is a fixed version (stable); the *-latest aliases follow Google's newest models.
-// GEMINI_MODEL in the environment puts a model of your choice first.
-const GEMINI_MODELS = [...new Set([process.env.GEMINI_MODEL, 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest'].filter(Boolean))];
-// Built-in Gemini key (server-side only; this file never ships to the browser). A GEMINI_API_KEY
-// set in the server environment overrides it, so the key can be rotated without a code change.
-const GEMINI_BUILTIN_KEY = 'AIzaSyAXJGNNbe5PxJb54ZFOq10kqIUp71NKAVU';
-const geminiKey = () => process.env.GEMINI_API_KEY || GEMINI_BUILTIN_KEY;
-// Claude is the backup when every Gemini model is busy. Its key must come from the server environment
-// (ANTHROPIC_API_KEY in .env.local): GitHub blocks pushes that contain Anthropic keys.
+// Palm reading runs on Claude. The key must come from the server environment (ANTHROPIC_API_KEY in
+// .env.local next to package.json): GitHub blocks pushes that contain Anthropic keys, so it can't live in code.
+// The client is created on first use so a key added to the environment is picked up after a restart.
 const claudeKey = () => process.env.ANTHROPIC_API_KEY || '';
-const provider = () => (geminiKey() ? 'gemini' : claudeKey() ? 'claude' : null);
 let claude;
-let gemini;
 const getClaude = () => (claude ||= new Anthropic({ apiKey: claudeKey() }));
-// SDK retries are off (attempts: 1) and each call is capped at 60s, so a busy model fails fast and
-// POST() moves on to the next model in GEMINI_MODELS, then to Claude.
-const getGemini = () => (gemini ||= new GoogleGenAI({ apiKey: geminiKey(), httpOptions: { timeout: 60_000, retryOptions: { attempts: 1 } } }));
 
-// Gemini overloaded or rate-limited: worth a retry or a fallback to Claude.
-class GeminiBusy extends Error {
-  constructor(status) {
-    super(typeof status === 'number' ? `HTTP ${status}` : status);
-  }
-}
-
-// Friendly errors raised by either provider and turned into a JSON response in POST().
+// Friendly errors raised while reading and turned into a JSON response in POST().
 class ReadingError extends Error {
   constructor(status, message) {
     super(message);
@@ -62,21 +40,20 @@ export async function GET() {
       if (!fs.existsSync(full)) return [f, 'not found'];
       const txt = fs.readFileSync(full, 'utf8');
       const has = (name) => new RegExp(`^\\s*${name}\\s*=\\s*\\S+`, 'm').test(txt);
-      const keys = ['GEMINI_API_KEY', 'ANTHROPIC_API_KEY'].filter(has);
-      return [f, keys.length ? `found, has ${keys.join(' + ')}` : 'found, no AI key line'];
+      return [f, has('ANTHROPIC_API_KEY') ? 'found, has ANTHROPIC_API_KEY' : 'found, NO ANTHROPIC_API_KEY line'];
     }),
   );
-  const using = provider();
+  const key = claudeKey();
   return Response.json({
-    using: using ? (using === 'gemini' ? `Gemini (${GEMINI_MODELS.join(' → ')})` : 'Claude (claude-opus-5-5)') : 'nothing — no key loaded',
-    geminiKey: process.env.GEMINI_API_KEY ? `${mask(process.env.GEMINI_API_KEY)} from environment` : 'built-in key in code',
-    anthropicKey: process.env.ANTHROPIC_API_KEY ? `${mask(process.env.ANTHROPIC_API_KEY)} from environment` : 'not set (optional backup)',
+    using: 'Claude (claude-opus-5-5)',
+    keyLoaded: Boolean(key),
+    anthropicKey: key ? mask(key) : 'NOT SET',
     mode: process.env.NODE_ENV,
     appFolder: cwd,
     envFiles: files,
-    hint: using
-      ? 'A key is loaded. Palm reading should work.'
-      : 'No key loaded. Put GEMINI_API_KEY=... in .env.local inside appFolder, then restart the app (e.g. pm2 restart <name>).',
+    hint: key
+      ? 'Key is loaded. Palm reading should work.'
+      : 'Key not loaded. Put ANTHROPIC_API_KEY=... in .env.local inside appFolder, then restart the app (e.g. pm2 restart <name>).',
   });
 }
 
@@ -174,9 +151,8 @@ Read only what is genuinely visible in the photo. Describe each line as you actu
 Tone: warm, encouraging, practical. Palmistry is traditional guidance, not certainty: never predict death, the exact age of death, serious illness, divorce or infertility as fact. Phrase health and relationship points as tendencies to look after. Remedies must be harmless.`;
 
 export async function POST(req) {
-  const using = provider();
-  if (!using) {
-    return Response.json({ error: 'AI palm reading is not configured on the server (GEMINI_API_KEY missing).' }, { status: 503 });
+  if (!claudeKey()) {
+    return Response.json({ error: 'AI palm reading is not configured on the server (ANTHROPIC_API_KEY missing).' }, { status: 503 });
   }
 
   let body;
@@ -208,27 +184,10 @@ ${JSON.stringify(SCHEMA)}`;
 
   let out;
   try {
-    if (using === 'gemini') {
-      for (const model of GEMINI_MODELS) {
-        try {
-          out = await readWithGemini(image, mediaType, prompt, model);
-          break;
-        } catch (err) {
-          if (!(err instanceof GeminiBusy)) throw err;
-          console.warn(`palmistry: ${model} unavailable (${err.message}), trying next`);
-        }
-      }
-      if (out === undefined) {
-        if (!claudeKey()) throw new ReadingError(503, 'The AI palm reader is very busy right now. Please try again in a minute.');
-        console.warn('palmistry: all Gemini models busy, falling back to Claude');
-        out = await readWithClaude(image, mediaType, prompt);
-      }
-    } else {
-      out = await readWithClaude(image, mediaType, prompt);
-    }
+    out = await readWithClaude(image, mediaType, prompt);
   } catch (err) {
     if (err instanceof ReadingError) return Response.json({ error: err.message }, { status: err.status });
-    console.error(`palmistry (${using}):`, err);
+    console.error('palmistry:', err);
     return Response.json({ error: 'Palm reading failed. Please try again.' }, { status: 502 });
   }
 
@@ -238,39 +197,6 @@ ${JSON.stringify(SCHEMA)}`;
     console.error('palmistry: unparseable reply', e.message, out.slice(0, 300));
     return Response.json({ error: 'The reading could not be prepared. Please try again.' }, { status: 502 });
   }
-}
-
-async function readWithGemini(image, mediaType, prompt, model) {
-  let response;
-  const started = Date.now();
-  try {
-    response = await getGemini().models.generateContent({
-      model,
-      contents: [{ role: 'user', parts: [{ inlineData: { mimeType: mediaType, data: image } }, { text: prompt }] }],
-      // LOW thinking keeps a reading to well under a minute; the default level can take several minutes.
-      config: { systemInstruction: SYSTEM, responseMimeType: 'application/json', maxOutputTokens: 16000, thinkingConfig: { thinkingLevel: ThinkingLevel.LOW } },
-    });
-  } catch (err) {
-    if (err instanceof GeminiApiError) {
-      console.error('palmistry: Gemini error', err.status, err.message);
-      // Overloaded, timed out, over quota, or this model is not offered to the key: try the next model.
-      if ([404, 429, 500, 503, 504].includes(err.status)) throw new GeminiBusy(err.status);
-      if (err.status === 400 && /api key/i.test(err.message)) throw new ReadingError(503, 'AI palm reading is not configured correctly (invalid GEMINI_API_KEY).');
-      if (err.status === 401 || err.status === 403) throw new ReadingError(503, 'AI palm reading is not configured correctly (GEMINI_API_KEY rejected).');
-      if (err.status === 400) throw new ReadingError(400, 'The photo could not be processed. Please try a different photo.');
-    }
-    // Our 60s per-call cap (or a dropped connection) also means "try the next model".
-    if (err?.name === 'AbortError' || /timed? ?out|abort|ECONNRESET|fetch failed/i.test(String(err?.message))) throw new GeminiBusy('timeout');
-    throw err;
-  }
-  const finish = response.candidates?.[0]?.finishReason;
-  if (response.promptFeedback?.blockReason || finish === 'SAFETY' || finish === 'PROHIBITED_CONTENT') {
-    throw new ReadingError(422, 'This photo could not be read. Please upload a clear photo of an open palm.');
-  }
-  const u = response.usageMetadata || {};
-  console.log(`palmistry: Gemini ${response.modelVersion || model} ${((Date.now() - started) / 1000).toFixed(1)}s, tokens in ${u.promptTokenCount} / thinking ${u.thoughtsTokenCount ?? 0} / out ${u.candidatesTokenCount}`);
-  if (finish === 'MAX_TOKENS') throw new ReadingError(502, 'The reading was cut short. Please try again.');
-  return response.text ?? '';
 }
 
 async function readWithClaude(image, mediaType, prompt) {
