@@ -20,6 +20,7 @@ import HeroArt from './HeroArt';
 import SeoContent from './SeoContent';
 import ManobalSection from './ManobalSection';
 import KarmkandSection from './KarmkandSection';
+import PalmistrySection from './PalmistrySection';
 import TodayUpayCard from '@/components/upay/TodayUpayCard';
 import useCity from '@/lib/useCity';
 import styles from './home.module.css';
@@ -411,6 +412,9 @@ export default function HomeClient() {
             ))}
           </div>
         </section>
+
+        {/* AI palmistry + Manglik % + Kundli Milan showcase */}
+        <PalmistrySection />
 
         {/* Learn: Karmkand + Jyotish course */}
         <section className={styles.block}>

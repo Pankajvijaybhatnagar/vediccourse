@@ -1,0 +1,36 @@
+.chart {
+  width: 100%;
+  display: block;
+}
+
+.signNum {
+  font-size: 13px;
+  font-weight: 700;
+  fill: #b88a3c;
+}
+
+.ascLabel {
+  font-size: 11px;
+  font-weight: 800;
+  fill: #e88a00;
+  letter-spacing: 1px;
+}
+
+.planetText {
+  font-size: 15px;
+  font-weight: 800;
+  fill: #8b1e1e;
+}
+
+/* The chart SVG scales down on phones; enlarge its text so it stays readable. */
+@media (max-width: 560px) {
+  .signNum {
+    font-size: 16px;
+  }
+  .ascLabel {
+    font-size: 14px;
+  }
+  .planetText {
+    font-size: 19px;
+  }
+}

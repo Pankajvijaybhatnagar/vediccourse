@@ -247,6 +247,38 @@
   font-weight: 800;
 }
 
+.chartWrap {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border, #e8dcc0);
+}
+
+.chartWrap h4 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.chartWrap svg {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.palmBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.chartNote {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
 .tableCard {
   min-width: 0;
   margin-bottom: 20px;
@@ -459,30 +491,7 @@
 .mPerson > strong {
   display: block;
   font-size: 0.9rem;
-}
-
-.mStatus {
-  display: inline-block;
-  margin: 6px 0 8px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.m_none .mStatus {
-  background: rgba(30, 158, 90, 0.12);
-  color: #146c3e;
-}
-
-.m_yes .mStatus {
-  background: rgba(239, 75, 63, 0.12);
-  color: #a3241b;
-}
-
-.m_cancelled .mStatus {
-  background: rgba(232, 138, 0, 0.14);
-  color: #8a5200;
+  margin-bottom: 10px;
 }
 
 .mPerson ul {

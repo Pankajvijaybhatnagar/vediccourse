@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, CheckCircle2, ShieldCheck, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Hand, ShieldCheck, XCircle } from 'lucide-react';
 import { localizeSign } from '@/lib/zodiac';
 import { buildKundli, GRAHAS } from '@/lib/kundli';
 import { CITIES } from '@/lib/panchang';
 import { kundliMilan, KOOTA_INFO } from '@/lib/milan';
 import { useLang } from '@/lib/i18n';
 import BirthPlacePicker from '@/components/BirthPlacePicker';
+import NorthIndianChart from '@/components/NorthIndianChart';
+import ManglikMeter from '@/components/ManglikMeter';
 import styles from './milan.module.css';
 
 const ABROAD = CITIES.filter((c) => c.tz !== 5.5);
@@ -192,11 +194,17 @@ function MoonCard({ role, name, info, kundli }) {
           <dd>{lagna.name}</dd>
         </div>
       </dl>
+      <div className={styles.chartWrap}>
+        <h4>{t({ en: 'Lagna Chart (D1)', hi: 'लग्न कुंडली (D1)' })}</h4>
+        <NorthIndianChart kundli={kundli} label={t({ en: `Lagna chart of ${name}`, hi: `${name} की लग्न कुंडली` })} />
+        <p className={styles.chartNote}>{t({ en: 'Numbers show the rashi in each house · * retrograde', hi: 'अंक प्रत्येक भाव की राशि दर्शाते हैं · * वक्री' })}</p>
+      </div>
+      <Link href={`/palmistry?gender=${role === 'boy' ? 'male' : 'female'}&name=${encodeURIComponent(name)}`} className={`btn btn-ghost btn-block ${styles.palmBtn}`}>
+        <Hand size={16} /> {role === 'boy' ? t({ en: 'Read palm (right hand)', hi: 'हस्त रेखा पढ़ें (दायाँ हाथ)' }) : t({ en: 'Read palm (left hand)', hi: 'हस्त रेखा पढ़ें (बायाँ हाथ)' })}
+      </Link>
     </div>
   );
 }
-
-const houseLabel = (n, t) => t({ en: `${n}${['th', 'st', 'nd', 'rd'][n % 10 > 3 || [11, 12, 13].includes(n) ? 0 : n % 10]}`, hi: `${n}वें` });
 
 function ManglikPerson({ label, data }) {
   const { t, lang } = useLang();
@@ -205,20 +213,15 @@ function ManglikPerson({ label, data }) {
   return (
     <div className={`${styles.mPerson} ${styles['m_' + status]}`}>
       <strong>{t(label)}</strong>
-      <span className={styles.mStatus}>
-        {status === 'none' && t({ en: 'Not Manglik', hi: 'मांगलिक नहीं' })}
-        {status === 'yes' && (data.strength === 'full' ? t({ en: 'Manglik', hi: 'मांगलिक' }) : t({ en: 'Manglik (partial)', hi: 'आंशिक मांगलिक' }))}
-        {status === 'cancelled' && t({ en: 'Manglik — cancelled', hi: 'मांगलिक — परिहार' })}
-      </span>
+      <ManglikMeter data={data} compact />
       <ul>
         <li>{t({ en: `Mars in ${sign.name}`, hi: `मंगल ${sign.name} राशि में` })}</li>
-        <li>{t({ en: `${houseLabel(data.fromLagna, t)} house from Lagna`, hi: `लग्न से ${data.fromLagna}वें भाव में` })}</li>
-        <li>{t({ en: `${houseLabel(data.fromMoon, t)} house from Moon`, hi: `चंद्र से ${data.fromMoon}वें भाव में` })}</li>
         {data.cancel.map((c) => (
           <li key={c.en} className={styles.mCancel}>
             ✓ {t(c)}
           </li>
         ))}
+        {status === 'cancelled' && <li className={styles.mCancel}>{t({ en: 'Dosha cancelled (parihar) for matching', hi: 'मिलान हेतु दोष का परिहार' })}</li>}
       </ul>
     </div>
   );
@@ -426,8 +429,8 @@ export default function KundliMilanClient() {
                 </p>
                 <p className={styles.small}>
                   {t({
-                    en: 'Checked from both Lagna and Moon. Mars in the 1st, 2nd, 4th, 7th, 8th or 12th house forms Mangal dosha.',
-                    hi: 'लग्न और चंद्र दोनों से जाँचा गया। मंगल 1, 2, 4, 7, 8 या 12वें भाव में हो तो मंगल दोष बनता है।',
+                    en: 'Mars in the 1st, 4th, 7th, 8th or 12th house from the Lagna = 40% Manglik. Only then the Moon (+30%) and Venus (+30%) are checked; 100% is Poorna Manglik.',
+                    hi: 'लग्न से मंगल 1, 4, 7, 8 या 12वें भाव में = 40% मांगलिक। तभी चंद्र (+30%) और शुक्र (+30%) से जाँच होती है; 100% पूर्ण मांगलिक है।',
                   })}
                 </p>
               </div>

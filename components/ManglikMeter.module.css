@@ -1,0 +1,135 @@
+.meter {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.head {
+  text-align: center;
+}
+
+.pill {
+  display: inline-block;
+  padding: 9px 22px;
+  border-radius: 99px;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.compact .pill {
+  font-size: 0.95rem;
+  padding: 6px 14px;
+}
+
+.none {
+  background: #dcf5e7;
+  color: var(--green);
+}
+
+.low {
+  background: #fff1d6;
+  color: #a86400;
+}
+
+.mid {
+  background: #ffe3cc;
+  color: #c24a00;
+}
+
+.high {
+  background: #fde2e0;
+  color: var(--vermilion);
+}
+
+.bar {
+  display: flex;
+  height: 10px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: #f3ead6;
+}
+
+.seg {
+  height: 100%;
+}
+
+.seg_lagna {
+  background: #f6a609;
+}
+
+.seg_moon {
+  background: #ef7a2f;
+}
+
+.seg_venus {
+  background: var(--vermilion);
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.steps li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+}
+
+.stepNo {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.stepText {
+  display: grid;
+  min-width: 0;
+}
+
+.stepText strong {
+  font-size: 0.92rem;
+}
+
+.stepText small {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.pts {
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.hit .pts {
+  color: var(--vermilion);
+}
+
+.miss .pts {
+  color: var(--green);
+}
+
+.skip {
+  opacity: 0.55;
+}
+
+.rule {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}

@@ -253,29 +253,10 @@
   text-align: center;
 }
 
-.bigStatus {
-  display: inline-block;
-  margin: 8px 0 14px;
-  padding: 10px 26px;
-  border-radius: 99px;
-  font-size: 1.3rem;
-  font-weight: 800;
-}
-
-.isManglik .bigStatus {
-  background: #fde2e0;
-  color: var(--vermilion);
-}
-
-.notManglik .bigStatus {
-  background: #dcf5e7;
-  color: var(--green);
-}
-
 .manglik p {
   color: var(--text-muted);
   font-size: 0.93rem;
-  margin: 0;
+  margin: 12px 0 0;
 }
 
 .phase {
