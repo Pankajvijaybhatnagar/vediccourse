@@ -11,7 +11,7 @@ import useToday from '@/lib/useToday';
 import { SIGNS, localizeSign } from '@/lib/zodiac';
 import { ASTROLOGERS, LIVE_SESSIONS, SKILLS, getAstrologer, initials, expertNo } from '@/lib/astrologers';
 import {
-  HERO_SLIDES, QUICK_ACTIONS, APPOINTMENTS, READINGS, CONSULT_TOPICS, BLOGS, VIDEOS, NEWS, STATS,
+  HERO_SLIDES, QUICK_ACTIONS, APPOINTMENTS, CONSULT_TOPICS, BLOGS, VIDEOS, NEWS, STATS,
   TESTIMONIALS, FAQS,
 } from '@/lib/content';
 import Icon from '@/components/Icon';
@@ -21,6 +21,7 @@ import SeoContent from './SeoContent';
 import ManobalSection from './ManobalSection';
 import KarmkandSection from './KarmkandSection';
 import PalmistrySection from './PalmistrySection';
+import FreeReadingsSection from './FreeReadingsSection';
 import TodayUpayCard from '@/components/upay/TodayUpayCard';
 import useCity from '@/lib/useCity';
 import styles from './home.module.css';
@@ -396,22 +397,7 @@ export default function HomeClient() {
         </section>
 
         {/* Free astrology readings */}
-        <section className={styles.block}>
-          <RowHead title={{ en: 'Free Astrology Readings', hi: 'मुफ़्त ज्योतिष रीडिंग' }} />
-          <div className={styles.readGrid}>
-            {READINGS.map((r, i) => (
-              <Reveal key={r.key} delay={(i % 6) * 60}>
-                <Link href={r.href} className={styles.reading}>
-                  <span className={`${styles.readArt} ${styles[`art_${r.key}`]}`}>
-                    <span className={styles.readRays} aria-hidden="true" />
-                    <Icon name={r.icon} size={54} strokeWidth={1.2} className={styles.readIcon} />
-                  </span>
-                  <span className={styles.readLabel}>{t(r.label)}</span>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </section>
+        <FreeReadingsSection />
 
         {/* AI palmistry + Manglik % + Kundli Milan showcase */}
         <PalmistrySection />
