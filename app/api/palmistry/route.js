@@ -20,10 +20,13 @@ const GEMINI_MODELS = [...new Set([process.env.GEMINI_MODEL, 'gemini-3.5-flash',
 // set in the server environment overrides it, so the key can be rotated without a code change.
 const GEMINI_BUILTIN_KEY = 'AIzaSyAXJGNNbe5PxJb54ZFOq10kqIUp71NKAVU';
 const geminiKey = () => process.env.GEMINI_API_KEY || GEMINI_BUILTIN_KEY;
-const provider = () => (geminiKey() ? 'gemini' : process.env.ANTHROPIC_API_KEY ? 'claude' : null);
+// Claude is the backup when every Gemini model is busy. Its key must come from the server environment
+// (ANTHROPIC_API_KEY in .env.local): GitHub blocks pushes that contain Anthropic keys.
+const claudeKey = () => process.env.ANTHROPIC_API_KEY || '';
+const provider = () => (geminiKey() ? 'gemini' : claudeKey() ? 'claude' : null);
 let claude;
 let gemini;
-const getClaude = () => (claude ||= new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
+const getClaude = () => (claude ||= new Anthropic({ apiKey: claudeKey() }));
 // SDK retries are off (attempts: 1) and each call is capped at 60s, so a busy model fails fast and
 // POST() moves on to the next model in GEMINI_MODELS, then to Claude.
 const getGemini = () => (gemini ||= new GoogleGenAI({ apiKey: geminiKey(), httpOptions: { timeout: 60_000, retryOptions: { attempts: 1 } } }));
@@ -67,7 +70,7 @@ export async function GET() {
   return Response.json({
     using: using ? (using === 'gemini' ? `Gemini (${GEMINI_MODELS.join(' → ')})` : 'Claude (claude-opus-5-5)') : 'nothing — no key loaded',
     geminiKey: process.env.GEMINI_API_KEY ? `${mask(process.env.GEMINI_API_KEY)} from environment` : 'built-in key in code',
-    anthropicKey: mask(process.env.ANTHROPIC_API_KEY),
+    anthropicKey: process.env.ANTHROPIC_API_KEY ? `${mask(process.env.ANTHROPIC_API_KEY)} from environment` : 'not set (optional backup)',
     mode: process.env.NODE_ENV,
     appFolder: cwd,
     envFiles: files,
@@ -216,7 +219,7 @@ ${JSON.stringify(SCHEMA)}`;
         }
       }
       if (out === undefined) {
-        if (!process.env.ANTHROPIC_API_KEY) throw new ReadingError(503, 'The AI palm reader is very busy right now. Please try again in a minute.');
+        if (!claudeKey()) throw new ReadingError(503, 'The AI palm reader is very busy right now. Please try again in a minute.');
         console.warn('palmistry: all Gemini models busy, falling back to Claude');
         out = await readWithClaude(image, mediaType, prompt);
       }
