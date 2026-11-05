@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import Anthropic from '@anthropic-ai/sdk';
 
 // Palm reading needs the Node runtime (SDK + larger request bodies).
@@ -7,7 +9,43 @@ export const maxDuration = 120;
 const MAX_BYTES = 5 * 1024 * 1024; // Claude's per-image limit (base64-decoded)
 const TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
+// Created on first use so a key added to the environment is picked up after a restart,
+// and a missing key gives our own clear error instead of crashing the module.
+let client;
+const getClient = () => (client ||= new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
+
+const ENV_FILES = ['.env', '.env.local', '.env.production', '.env.production.local', '.env.development', '.env.development.local'];
+
+/**
+ * GET /api/palmistry — safe configuration check for the server (never reveals the key).
+ * Shows whether the key is loaded, which env files the running app can see, and the mode,
+ * so a "key missing" error on a deployed server can be diagnosed from the browser.
+ */
+export async function GET() {
+  const key = process.env.ANTHROPIC_API_KEY || '';
+  const cwd = process.cwd();
+  const files = Object.fromEntries(
+    ENV_FILES.map((f) => {
+      const full = path.join(cwd, f);
+      if (!fs.existsSync(full)) return [f, 'not found'];
+      const hasKey = /^\s*ANTHROPIC_API_KEY\s*=\s*\S+/m.test(fs.readFileSync(full, 'utf8'));
+      return [f, hasKey ? 'found, has ANTHROPIC_API_KEY' : 'found, NO ANTHROPIC_API_KEY line'];
+    }),
+  );
+  return Response.json({
+    keyLoaded: Boolean(key),
+    keyStartsWith: key ? `${key.slice(0, 10)}…` : null,
+    keyLength: key.length,
+    mode: process.env.NODE_ENV,
+    appFolder: cwd,
+    envFiles: files,
+    hint: key
+      ? 'Key is loaded. Palm reading should work.'
+      : process.env.NODE_ENV === 'production'
+        ? 'Key not loaded. Put ANTHROPIC_API_KEY=... in .env.local (or .env.production) inside appFolder, then restart the app (e.g. pm2 restart <name>).'
+        : 'Key not loaded. This server runs in development mode, which ignores .env.production. Put the key in .env.local inside appFolder, then restart.',
+  });
+}
 
 // Every reader-facing field comes back in English (_en) and Hindi (_hi) so the site's EN/HI toggle
 // switches instantly. This schema is too big for strict structured outputs (grammar limit), so it is
@@ -135,7 +173,7 @@ Reply with ONLY one JSON object (no markdown, no commentary) that matches this J
 ${JSON.stringify(SCHEMA)}`;
 
   try {
-    const response = await client.beta.messages.create({
+    const response = await getClient().beta.messages.create({
       model: 'claude-opus-5-5',
       max_tokens: 16000,
       betas: ['server-side-fallback-2026-07-01'],
