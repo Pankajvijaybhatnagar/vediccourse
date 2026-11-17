@@ -1,9 +1,9 @@
 import {
   Award, Briefcase, BrainCircuit, CalendarDays, Eye, Flame, Flower2, Gem, Globe, Grid3x3, Hand, Hash, Heart,
-  House, IndianRupee, Layers, Orbit, PhoneCall, Sparkles, Star, Sun, Users, Venus,
+  HelpCircle, House, IndianRupee, Layers, Orbit, PhoneCall, Sparkles, Star, Sun, Users, Venus,
 } from 'lucide-react';
 
-const ICONS = { Award, Briefcase, BrainCircuit, CalendarDays, Eye, Flame, Flower2, Gem, Globe, Grid3x3, Hand, Hash, Heart, House, IndianRupee, Layers, Orbit, PhoneCall, Sparkles, Star, Sun, Users, Venus };
+const ICONS = { Award, Briefcase, BrainCircuit, CalendarDays, Eye, Flame, Flower2, Gem, Globe, Grid3x3, Hand, Hash, Heart, HelpCircle, House, IndianRupee, Layers, Orbit, PhoneCall, Sparkles, Star, Sun, Users, Venus };
 
 /** Renders a lucide icon by name; "om" renders the ॐ glyph. */
 export default function Icon({ name, size = 24, strokeWidth = 1.6, className }) {

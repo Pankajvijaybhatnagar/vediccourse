@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, Camera, Hand, Sparkles, Upload } from 'lucide-react';
 import { useLang } from '@/lib/i18n';
+import compressImage from '@/lib/compressImage';
 import styles from './palmistry.module.css';
 
 const LINES = [
@@ -34,29 +35,7 @@ const PROMINENCE = {
 const HAND = { left: { en: 'Left hand', hi: 'बायाँ हाथ' }, right: { en: 'Right hand', hi: 'दायाँ हाथ' } };
 const mainHand = (gender) => (gender === 'female' ? 'left' : 'right');
 
-// Shrink the photo in the browser: phone photos are often 5–12 MB, the API takes 5 MB max,
-// and ~1600px keeps the lines sharp enough to read.
-function compress(file) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(url);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-      resolve({ dataUrl, data: dataUrl.split(',')[1], mediaType: 'image/jpeg' });
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('unreadable'));
-    };
-    img.src = url;
-  });
-}
+const compress = (file) => compressImage(file);
 
 export default function PalmistryClient() {
   const { t } = useLang();

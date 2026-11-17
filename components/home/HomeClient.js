@@ -21,6 +21,7 @@ import SeoContent from './SeoContent';
 import ManobalSection from './ManobalSection';
 import KarmkandSection from './KarmkandSection';
 import PalmistrySection from './PalmistrySection';
+import PrashnaSection from './PrashnaSection';
 import FreeReadingsSection from './FreeReadingsSection';
 import TodayUpayCard from '@/components/upay/TodayUpayCard';
 import useCity from '@/lib/useCity';
@@ -401,6 +402,9 @@ export default function HomeClient() {
 
         {/* AI palmistry + Manglik % + Kundli Milan showcase */}
         <PalmistrySection />
+
+        {/* Prashna Kundali: Ram Shalaka, palm, chart of the moment, fruit/vegetable names, number, swar */}
+        <PrashnaSection />
 
         {/* Learn: Karmkand + Jyotish course */}
         <section className={styles.block}>
